@@ -878,7 +878,6 @@ function template_preprocess_ebsco_results(&$variables) {
     drupal_set_title('Search results' . $title);
 
     $Document->search();
-    $variables['jsonobj'] = $Document->search();
     $variables['records'] = $Document->records();
     $variables['record_start'] = $Document->record_start();
     $variables['record_end'] = $Document->record_end();
@@ -906,51 +905,6 @@ function template_preprocess_ebsco_results(&$variables) {
     $Document->search_write();
 }
 
-/**
-* Process variables for ebsco-json.tpl.php.
-*
-* @see ebsco-json.tpl.php
-*/
-function template_preprocess_ebsco_json(&$variables) {
-  global $Document;
-  $params = $_REQUEST;
-
-  $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-  if (empty($Document)) {
-    $Document = new EBSCODocument();
-  }
-
-  //$title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
-  //drupal_set_title('Search results' . $title);
-
-  $Document->search();
-
-  $variables['records'] = $Document->records();
-  $variables['record_start'] = $Document->record_start();
-  $variables['record_end'] = $Document->record_end();
-  $variables['record_count'] = $Document->record_count();
-  $variables['search_view'] = $Document->search_view();
-  $variables['search_time'] = $Document->search_time();
-  $variables['lookfor'] = '';
-  if (isset($params['lookfor'])) {
-    $variables['lookfor'] = $params['lookfor'];
-  } else if (isset($params['group'])) {
-    $types = EBSCODocument::basic_search_type_options();
-    foreach ($params['group'] as $key => $group) {
-      if (!empty($group['lookfor'])) {
-        $pre = $key == 0 ? '' : " {$group['bool']} ";
-        $variables['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
-      }
-    }
-  }
-  //$variables['pager'] = $Document->pager();
-
-  $v1=drupal_get_form('ebsco_sort_form');
-  //$variables['sort_form'] = drupal_render($v1);
-
-  // Save data needed by scroller in Detailed view page
-  $Document->search_write();
-}
 
 
 /**
@@ -965,31 +919,32 @@ function ebsco_crud_api_page() {
   if (empty($Document)) {
     $Document = new EBSCODocument();
   }
-
-  //$title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
-  //drupal_set_title('Search results' . $title);
-
   $Document->search();
-
-  $output['records'] = $Document->records();
-  $output['record_start'] = $Document->record_start();
-  $output['record_end'] = $Document->record_end();
-  $output['record_count'] = $Document->record_count();
-  $output['search_view'] = $Document->search_view();
-  $output['search_time'] = $Document->search_time();
-  $output['lookfor'] = '';
+  $output['searchTerm'] = '';
   if (isset($params['lookfor'])) {
-    $output['lookfor'] = $params['lookfor'];
+    $output['searchTerm'] = $params['lookfor'];
   } else if (isset($params['group'])) {
     $types = EBSCODocument::basic_search_type_options();
     foreach ($params['group'] as $key => $group) {
       if (!empty($group['lookfor'])) {
         $pre = $key == 0 ? '' : " {$group['bool']} ";
-        $output['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+        $output['searchTerm'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
       }
     }
   }
+  if (isset($params['type'])) {
+    $output['fieldCode'] = $params['type'];
+  }
+  $output['results']['recordCount'] = $Document->record_count();
+  $output['results']['queries'] = $params;
+  $output['results']['records'] = $Document->jsonObj();
+  $output['results']['record_start'] = $Document->record_start();
+  $output['results']['record_end'] = $Document->record_end();
+  $output['searchView'] = $Document->search_view();
+  $output['searchTime'] = $Document->search_time();
+  $output['Info'] = $Document->info();
 
+  
   // Save data needed by scroller in Detailed view page
   $Document->search_write();
 

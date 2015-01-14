@@ -99,6 +99,12 @@ class EBSCORecord
      public $publication_type = null;
 
      /**
+     * The publication type link of the record.
+     * @global string
+     */
+     public $PubTypeId = null;
+     
+     /**
      * The external thumbnails links of the record.
      * @global string
      */
@@ -145,6 +151,7 @@ class EBSCORecord
         $this->items = $this->items();
         $this->p_link = $this->p_link();
         $this->publication_type = $this->publication_type();
+        $this->PubTypeId = $this->PubTypeId();
         $this->pdf_availability = $this->pdf_availability();
         $this->pdf_link = $this->pdf_link();
         $this->small_thumb_link = $this->thumb_link();
@@ -277,7 +284,16 @@ class EBSCORecord
         return isset($this->data['PubType']) ? $this->data['PubType'] : '';
     }
 
-
+    /**
+     * Get the publication type Id of the record.
+     *
+     * @return string
+     */
+    public function PubTypeId()
+    {
+        return isset($this->data['PubTypeId']) ? $this->data['PubTypeId'] : '';
+    }
+    
     /**
      * Get the PDF availability of the record.
      *

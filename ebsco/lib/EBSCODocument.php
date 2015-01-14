@@ -272,7 +272,22 @@ class EBSCODocument
         return $this->records;
     }
 
+    /**
+     * Get the EBSCORecord models array from results array
+     *
+     ** @return array
+     */
+    public function jsonObj()
+    {
+        if (empty($this->records) && !(empty($this->results))) {
+            foreach($this->results['documents'] as $result) {
+                $this->records[] = $result;
+            }
+        }
 
+        return $this->records;
+    }
+    
     /**
      * Get the pagination HTML string
      *
