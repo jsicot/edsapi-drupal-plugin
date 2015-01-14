@@ -383,7 +383,7 @@
 
 /** Icons ***/
 
-.icon {
+.page-ebsco .icon {
     background: url("../images/sprites_32.png") no-repeat top left;
     height: 32px;
     line-height: 32px;
@@ -391,34 +391,34 @@
     padding: 0  0 0 36px !important;
 }
 
-.icon.ebook {
+.page-ebsco .icon.ebook {
     background-position: 0 0;
 }
 
-.icon.html {
+.page-ebsco .icon.html {
     background-position: 0 -42px;
 }
 
-.icon.pdf {
+.page-ebsco .icon.pdf {
     background-position: 0 -84px;
 }
 
-.icon13 {
+.page-ebsco .icon13 {
     background: url("../images/sprites_32.png") no-repeat top left;
     padding-left: 18px !important;
     width: 13px;
     height: 13px;
 }
 
-.icon13.collapsed {
+.page-ebsco .icon13.collapsed {
     background-position: 0 -126px;
 }
 
-.icon13.expanded {
+.page-ebsco .icon13.expanded {
     background-position: 0 -149px;
 }
 
-.icon16 {
+.page-ebsco .icon16 {
     background: url("../images/sprites_32.png") no-repeat top left;
     padding-left: 21px !important;
     width: 16px;
@@ -426,6 +426,6 @@
     display: inline-block;
 }
 
-.icon16.tick {
+.page-ebsco .icon16.tick {
     background-position: 0 -171px;
 }

@@ -39,14 +39,14 @@ function ebsco_help($path, $arg) {
     switch ($path) {
         case "admin/help#ebsco":
             $output .= '<h2>'.  t("Full-text articles and eBooks from EBSCOhost Discovery Services") .'</h2>';
-            $output .= '<p>'. t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of 
+            $output .= '<p>'. t("EBSCO Discovery Service provides users with an easy, yet powerful means of accessing all of
                 an institution's information resources through a single search.") .'</p>';
-            $output .= '<p>'. t("This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources, 
+            $output .= '<p>'. t("This is achieved by harvesting metadata from both internal (library) and external (database vendors) sources,
                 and creating a pre-indexed service of unprecedented size and speed.") .'</p>';
-            $output .= '<p>'. t("Although the resulting collection can be massive in size and scope, the fact that it is indexed locally 
+            $output .= '<p>'. t("Although the resulting collection can be massive in size and scope, the fact that it is indexed locally
                 (on the EBSCOhost&reg; servers) allows for exceptionally fast search response times.") .'</p>';
-            $output .= '<p>'. t("As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with 
-                regard to both the underlying collection of metadata as well as the front-end delivery of search results. 
+            $output .= '<p>'. t("As no two institutions are the same, EBSCO Discovery Service offers a vast array of customization options with
+                regard to both the underlying collection of metadata as well as the front-end delivery of search results.
                 All of this functionality is based upon the powerful EBSCOhost search experience familiar to researchers worldwide.") .'</p>';
         break;
     }
@@ -64,6 +64,9 @@ function ebsco_theme() {
         ),
         'ebsco_results' => array(
             'template' => 'templates/ebsco-results'
+        ),
+        'ebsco_json' => array(
+          'template' => 'templates/ebsco-json'
         ),
         'ebsco_side_facets' => array(
             'template' => 'templates/ebsco-side-facets'
@@ -220,6 +223,12 @@ function ebsco_menu() {
         'type' => MENU_CALLBACK
     );
 
+    $items['ebsco/json'] = array(
+      'page callback' => 'ebsco_crud_api_page',
+      'access callback' => true,
+      'type' => MENU_CALLBACK
+    );
+
     $items['ebsco/result'] = array(
         'title' => 'EBSCO Record',
         'page callback' => 'ebsco_result_page',
@@ -315,6 +324,9 @@ function ebsco_results_page() {
     return theme('ebsco_results');
 }
 
+function ebsco_json_page() {
+  return theme('ebsco_json');
+}
 
 function ebsco_result_page() {
     $is_xhr = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
@@ -487,7 +499,7 @@ function ebsco_basic_search_form() {
                 '#type'          => 'checkbox',
                 '#default_value' => $value, // doesn't work
                 '#attributes'    => array('checked' => 'checked', 'value' => $value)
-								
+
             );
         }
 
@@ -656,11 +668,11 @@ function ebsco_advanced_search_form() {
             '#title_display' => 'after',
             '#name'          => 'filter[]',
             '#attributes'    => array('value' => $expander['Action']),
-            '#checked'       => $expander['selected']	
+            '#checked'       => $expander['selected']
         );
 		$element['#children'] = ($key != 0) ? '<br />' : '';
         $element['#children'] .= theme('checkbox', array('element' => $element));
-		
+
         $children[] = theme('form_element', array('element' => $element));
 
     }
@@ -672,7 +684,7 @@ function ebsco_advanced_search_form() {
         '#children'  => implode('', $children)
     );
 
-    $checkboxes = $selects = $dates = array(); 
+    $checkboxes = $selects = $dates = array();
     foreach($limiters as $key => $limiter) {
         if ($limiter['Type'] == 'text' || $limiter['Type'] == 'select') {
             $element = array(
@@ -683,7 +695,7 @@ function ebsco_advanced_search_form() {
                 '#name'          => 'filter[]',
                 '#attributes'    => array('value' => str_replace('value', 'y', $limiter['Action'])),
                 '#checked'       => $limiter['selected']
-				
+
             );
             $element['#children'] = ($key != 0) ? '<br />' : '';
 			if (!isset($element['#children']))
@@ -866,7 +878,7 @@ function template_preprocess_ebsco_results(&$variables) {
     drupal_set_title('Search results' . $title);
 
     $Document->search();
-
+    $variables['jsonobj'] = $Document->search();
     $variables['records'] = $Document->records();
     $variables['record_start'] = $Document->record_start();
     $variables['record_end'] = $Document->record_end();
@@ -894,6 +906,102 @@ function template_preprocess_ebsco_results(&$variables) {
     $Document->search_write();
 }
 
+/**
+* Process variables for ebsco-json.tpl.php.
+*
+* @see ebsco-json.tpl.php
+*/
+function template_preprocess_ebsco_json(&$variables) {
+  global $Document;
+  $params = $_REQUEST;
+
+  $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+  if (empty($Document)) {
+    $Document = new EBSCODocument();
+  }
+
+  //$title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
+  //drupal_set_title('Search results' . $title);
+
+  $Document->search();
+
+  $variables['records'] = $Document->records();
+  $variables['record_start'] = $Document->record_start();
+  $variables['record_end'] = $Document->record_end();
+  $variables['record_count'] = $Document->record_count();
+  $variables['search_view'] = $Document->search_view();
+  $variables['search_time'] = $Document->search_time();
+  $variables['lookfor'] = '';
+  if (isset($params['lookfor'])) {
+    $variables['lookfor'] = $params['lookfor'];
+  } else if (isset($params['group'])) {
+    $types = EBSCODocument::basic_search_type_options();
+    foreach ($params['group'] as $key => $group) {
+      if (!empty($group['lookfor'])) {
+        $pre = $key == 0 ? '' : " {$group['bool']} ";
+        $variables['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+      }
+    }
+  }
+  //$variables['pager'] = $Document->pager();
+
+  $v1=drupal_get_form('ebsco_sort_form');
+  //$variables['sort_form'] = drupal_render($v1);
+
+  // Save data needed by scroller in Detailed view page
+  $Document->search_write();
+}
+
+
+/**
+* The CRUD API for communication with Backbone.
+*/
+function ebsco_crud_api_page() {
+  global $Document;
+  $params = $_REQUEST;
+  $output = array();
+
+  $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+  if (empty($Document)) {
+    $Document = new EBSCODocument();
+  }
+
+  //$title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
+  //drupal_set_title('Search results' . $title);
+
+  $Document->search();
+
+  $output['records'] = $Document->records();
+  $output['record_start'] = $Document->record_start();
+  $output['record_end'] = $Document->record_end();
+  $output['record_count'] = $Document->record_count();
+  $output['search_view'] = $Document->search_view();
+  $output['search_time'] = $Document->search_time();
+  $output['lookfor'] = '';
+  if (isset($params['lookfor'])) {
+    $output['lookfor'] = $params['lookfor'];
+  } else if (isset($params['group'])) {
+    $types = EBSCODocument::basic_search_type_options();
+    foreach ($params['group'] as $key => $group) {
+      if (!empty($group['lookfor'])) {
+        $pre = $key == 0 ? '' : " {$group['bool']} ";
+        $output['lookfor'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+      }
+    }
+  }
+
+  // Save data needed by scroller in Detailed view page
+  $Document->search_write();
+
+
+  if ($_GET['callback']) {
+    drupal_add_http_header('Content-Type', 'application/json');
+    echo $_GET['callback'] . '(' . drupal_json_encode($output) . ');';
+  }
+  else {
+    drupal_json_output( $output );
+  }
+}
 
 /**
  * Process variables for ebsco-basic-search.tpl.php.
