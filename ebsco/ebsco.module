@@ -351,10 +351,10 @@ function ebsco_fulltext_page() {
     } else {
         $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
         if ($is_xhr) {
-            echo "<script type=\"text/javascript\">window.location.href = '" . url('user') . "';</script>";
+            echo "<script type=\"text/javascript\">window.location.href = '" . url('cas') . "';</script>";
             return;
         } else {
-            drupal_goto('user');
+            drupal_goto('cas');
         }
     }
 }
@@ -373,7 +373,7 @@ function ebsco_pdf_page() {
         drupal_goto($record->pdf_link);
     } else {
         $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
-        drupal_goto('user');
+        drupal_goto('cas');
     }
 }
 
@@ -875,7 +875,7 @@ function template_preprocess_ebsco_results(&$variables) {
     }
 
     $title = !empty($params['lookfor']) ? ' - ' . $params['lookfor'] : '';
-    drupal_set_title('Search results' . $title);
+    drupal_set_title('Resultat de la recherche' . $title);
 
     $Document->search();
     $variables['records'] = $Document->records();
@@ -910,12 +910,11 @@ function template_preprocess_ebsco_results(&$variables) {
 /**
 * The CRUD API for communication with Backbone.
 */
-function ebsco_crud_api_page() {
+	function ebsco_crud_api_page() {
   global $Document;
   $params = $_REQUEST;
   $output = array();
 
-  $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
   if (empty($Document)) {
     $Document = new EBSCODocument();
   }
@@ -935,6 +934,7 @@ function ebsco_crud_api_page() {
   if (isset($params['type'])) {
     $output['fieldCode'] = $params['type'];
   }
+  $output['results']['publication'] = $Document->publication();
   $output['results']['recordCount'] = $Document->record_count();
   $output['results']['queries'] = $params;
   $output['results']['records'] = $Document->jsonObj();
@@ -944,7 +944,7 @@ function ebsco_crud_api_page() {
   $output['searchTime'] = $Document->search_time();
   $output['Info'] = $Document->info();
 
-  
+
   // Save data needed by scroller in Detailed view page
   $Document->search_write();
 
