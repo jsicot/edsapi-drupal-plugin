@@ -44,7 +44,7 @@ class EBSCOAPI
 
 
     /**
-     * VuFind search types mapped to EBSCO search types 
+     * VuFind search types mapped to EBSCO search types
      * used for urls in search results / detailed result
      * @global array
      */
@@ -60,7 +60,7 @@ class EBSCOAPI
 
 
     /**
-     * EBSCO sort options 
+     * EBSCO sort options
      * @global array
      */
     private static $sort_options = array(
@@ -72,7 +72,7 @@ class EBSCOAPI
 
 
     /**
-     * VuFind sort types mapped to EBSCO sort types 
+     * VuFind sort types mapped to EBSCO sort types
      * used for urls in Search results / Detailed view
      * @global array
      */
@@ -232,6 +232,7 @@ class EBSCOAPI
         );
 
         $response = call_user_func_array(array($this->connector(), "request{$action}"), array($params, $headers));
+
         if ($this->isError($response)) {
             // Retry the request if there were authentication errors
             $code = $response->getCode();
@@ -370,7 +371,7 @@ class EBSCOAPI
      * @access public
      */
     public function apiSearch($search, $filters,
-        $start = 1, $limit = 10, $sortBy = 'relevance', $amount = 'detailed', $mode = 'all'
+        $start = 1, $limit = 5, $sortBy = 'relevance', $amount = 'detailed', $mode = 'all'
     ) {
         $query = array();
 
@@ -488,7 +489,7 @@ class EBSCOAPI
             'view'           => $amount,
             /// Specifies whether or not to include facets
             'includefacets'  => 'y',
-            'resultsperpage' => $limit,
+            'resultsperpage' => 5,
             'pagenumber'     => $start,
             // Specifies whether or not to include highlighting in the search results
             'highlight'      => 'y'
@@ -499,6 +500,143 @@ class EBSCOAPI
         $result = $this->request('Search', $params);
         return $result;
     }
+
+
+    /**
+    * Wrapper for search Publication API call
+    *
+    * @param array  $search      The search terms
+    * @param array  $filters     The facet filters
+    * @param string $start       The page to start with
+    * @param string $limit       The number of records to return
+    * @param string $sortBy      The value to be used by for sorting
+    * @param string $amount      The amount of data to be returned
+    *
+    * @throws object             PEAR Error
+    * @return array              An array of query results
+    * @access public
+    */
+    public function apiPublication($search, $filters,
+    $start = 1, $limit = 10, $sortBy = 'relevance', $amount = 'detailed') {
+      $query = array();
+
+      // Basic search
+      if(!empty($search['lookfor'])) {
+        $lookfor = $search['lookfor'];
+        $search['index'] = '';
+        $type = isset($search['index']) && !empty($search['index']) ? $search['index'] : 'AllFields';
+
+        // escape some characters from lookfor term
+        $term = str_replace(array(',', ':', '(', ')'), array('\,', '\:', '\(', '\)'), $lookfor);
+        // replace multiple consecutive empty spaces with one empty space
+        $term = preg_replace("/\s+/", ' ', $term);
+
+        // search terms
+        // Complex search term
+        if (preg_match('/(.*) (AND|OR) (.*)/i', $term)) {
+          $query['query'] = $term;
+        } else {
+          $tag = self::$search_tags[$type];
+          $op = 'AND';
+          $query_str = implode(',', array($op, $tag));
+          $query_str = implode(($tag ? ':' : ''), array($query_str, $term));
+          $query['query-1'] = $query_str;
+        }
+
+        // Advanced search
+      } else if(!empty($search['group'])) {
+
+        $counter = 1;
+        foreach ($search['group'] as $group) {
+          $type = $group['type'];
+          if (isset($group['lookfor'])) {
+            $term = $group['lookfor'];
+            $op = $group['bool'];
+            $tag = $type && isset(self::$search_tags[$type]) ? self::$search_tags[$type] : '';
+
+            // escape some characters from lookfor term
+            $term = str_replace(array(',', ':', '(', ')'), array('\,', '\:', '\(', '\)'), $term);
+            // replace multiple consecutive empty spaces with one empty space
+            $term = preg_replace("/\s+/", ' ', $term);
+            if (!empty($term)) {
+              $query_str = implode(',', array($op, $tag));
+              $query_str = implode(($tag ? ':' : ''), array($query_str, $term));
+              $query["query-$counter"] = $query_str;
+              $counter++;
+            }
+          }
+        }
+
+        // No search term, return an empty array
+      } else {
+        $results = array(
+        'recordCount' => 0,
+        'numFound'    => 0,
+        'start'       => 0,
+        'documents'   => array(),
+        'facets'      => array()
+        );
+        return $results;
+      }
+
+      // Add filters
+      $limiters = array(); $facets = array();
+      foreach ($filters as $filter) {
+        if (preg_match('/addlimiter/', $filter)) {
+          list($action, $str) = explode('(', $filter, 2);
+          $field_and_value = substr($str, 0, -1); // e.g. FT:y or GZ:Student Research, Projects and Publications
+          list($field, $value) = explode(':', $field_and_value, 2);
+          $limiters[$field][] = $value;
+        } else if (preg_match('/addfacetfilter/', $filter)) {
+          list($action, $str) = explode('(', $filter, 2);
+          $field_and_value = substr($str, 0, -1); // e.g. ZG:FRANCE
+          list($field, $value) = explode(':', $field_and_value, 2);
+          $facets[$field][] = $field_and_value;
+        }
+      }
+      if (!empty($limiters)) {
+        foreach($limiters as $field => $limiter) {
+          $query['limiter'][] = $field . ':' . implode(',', $limiter); // e.g. LA99:English,French,German
+        }
+      }
+      if (!empty($facets)) {
+        $groupId = 1;
+        foreach($facets as $field => $facet) {
+          $query['facetfilter'][] = $groupId . ',' . implode(',', $facet); // e.g. 1,DE:Math,DE:History
+          $groupId += 1;
+        }
+      }
+
+      // Add the sort option
+      $sortBy = in_array($sortBy, self::$sort_options) ? $sortBy : self::$mapped_sort_options[$sortBy];
+
+      // Add the HTTP query params
+      $params = array(
+      // Specifies the sort. Valid options are:
+      // relevance, date, date2
+      // date = Date descending
+      // date2 = Date ascending
+      'sort'           => 'relevance',
+      // Specifies the amount of data to return with the response
+      // Valid options are:
+      // title: Title only
+      // brief: Title + Source, Subjects
+      // detailed: Brief + full abstract
+      'view'           => 'detailed',
+      /// Specifies whether or not to include facets
+      'includefacets'  => 'n',
+      'resultsperpage' => $limit,
+      'pagenumber'     => $start,
+      // Specifies whether or not to include highlighting in the search results
+      'highlight'      => 'y'
+      );
+
+      $params = array_merge($params, $query);
+
+      $result = $this->request('Publication', $params);
+      return $result;
+    }
+
 
 
     /**
@@ -547,9 +685,9 @@ class EBSCOAPI
 
 
     /**
-     * Handle a PEAR_Error. Return : 
+     * Handle a PEAR_Error. Return :
      * - if the error is critical : an associative array with the current error message
-     * - if the error is not critical : the error message 
+     * - if the error is not critical : the error message
      *
      * @param Pear_Error $exception
      *

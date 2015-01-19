@@ -23,13 +23,6 @@
   <?php print $sort_form; ?>
   <?php print $pager; ?>
 
-  <?php if (!user_is_logged_in()): ?>
-    <?php $link = '<a href="' . url('user') . '">' . t('Login') . '</a>'; ?>
-    <p class="top-login-message">
-      <?php print sprintf(t('Hello, Guest. %s for full access.'), $link); ?>
-    </p>
-  <?php endif; ?>
-
   <ol class="search-results ebsco">
     <?php foreach ($records as $record): ?>
       <?php
@@ -42,6 +35,13 @@
         <div class="record-number floatleft">
           <?php print $record->result_id; ?>
         </div>
+
+	<div class="doc-type floatleft">
+		<?php if (isset($record->PubTypeId) && !empty($record->PubTypeId) && isset($record->publication_type) && !empty($record->publication_type) && $record->PubTypeId != "pt-unknown"): ?>
+		<div class="pt-icon pt-<?php echo $record->PubTypeId; ?>"></div>
+		<div><?php echo $record->publication_type; ?></div>
+		<?php endif; ?>
+	</div>
 
         <div class="result floatleft">
           <div class="span-2">
@@ -58,11 +58,9 @@
                 <p>
                   <?php
                       $label = '<strong>' . check_plain($record->db_label) . '</strong>'; 
-                      $link = '<a href="' . url('user') . '">' . t('Login') . '</a>';
                   ?>
-                  <?php print sprintf(t('This result from %s cannot be displayed to guests.'), $label); ?>
+                  <?php print sprintf(t('Cette notice de %s n\'est pas visible en mode non authentifié.'), $label); ?>
                   <br />
-                  <strong><?php print sprintf(t('%s for full access.'), $link); ?></strong>
                 </p>
               <?php elseif ($record->title): ?>
                 <a href="<?php print $recordUrl; ?>" class="title _record_link">
@@ -74,8 +72,13 @@
             <div class="result-line2">
               <?php if (!empty($record->authors)): ?>
                 <p>
-                  <?php print t('by'); ?>
-                  <?php print $record->authors; ?>
+                  <?php print t('by')." ";
+			$authors = explode('<br />',$record->authors);
+			foreach($authors as $i => $author) {
+				if ($i < 3) echo ($i!=0?' ; ':'').preg_replace("/a>.*$/","a>",$author);
+			}
+			if ($i > 2) echo " et al.";
+		  ?>
                 </p>
               <?php endif; ?>
 
@@ -93,39 +96,56 @@
                 <br />
               <?php endif; ?>
 
-              <?php if (!empty($record->subjects)): ?>
-                <strong><?php print t('Subjects'); ?></strong>:
-                <span class="quotestart"><?php print str_replace('<br />', ', ', $record->subjects); ?></span>
-              <?php endif; ?>
             </div>
-
-            <?php if (!empty($record->custom_links)): ?>
-              <div class="result-line4">
-                <ul class="custom-links">
-                  <?php foreach ($record->custom_links as $link): ?>
-                    <li>
-                      <a href="<?php print $link['Url']; ?>" target="_blank" title="<?php print $link['MouseOverText']; ?>" class="external-link">
-                        <?php if ($link['Icon']): ?><img src="<?php print $link['Icon']?>" /><?php endif; ?><?php print $link['Name']; ?>
-                      </a>
-                    </li>
-                  <?php endforeach; ?>
-                </ul>
-              </div>
-            <?php endif; ?>
 
             <div class="result-line5">
               <?php if ($record->full_text_availability): ?>
-                <a href="<?php print $fulltextUrl; ?>#html" class="icon html fulltext _record_link">
-                  <?php print t('HTML full text'); ?>
-                </a>
-                &nbsp; &nbsp;
+		<div class="clearfix">
+		  <div class="item-status item-web">
+		    <i class="fa fa-globe"> </i>
+		  </div>
+		  <div class="webressources">
+		    <a href="<?php print $fulltextUrl; ?>" target="_blank">Consulter en html</a>
+		  </div>
+		</div>
               <?php endif; ?>
 
               <?php if ($record->pdf_availability): ?>
-                <a href="<?php print $pdfUrl; ?>" class="icon pdf fulltext">
-                  <?php print t('PDF full text'); ?>
-                </a>
+		<div class="clearfix">
+		  <div class="item-status item-pdf">
+                    <i class="fa fa-file-pdf-o"> </i>
+                  </div>
+                  <div class="webressources">
+                    <a href="<?php print $pdfUrl; ?>" target="_blank">Consulter le PDF</a>
+                  </div>                
+		</div>
               <?php endif; ?>
+
+	      <?php if (!empty($record->custom_links)): ?>
+		<?php foreach ($record->custom_links as $link): ?>
+		  <div class="clearfix">
+                    <div class="item-status item-web">
+		      <i class="fa fa-globe"> </i>
+		    </div>
+		    <div class="webressources">
+                      <a href="<?php print $link['Url']; ?>" target="_blank" title="<?php print $link['MouseOverText']; ?>" class="external-link">
+                        <?php print $link['MouseOverText']; ?>
+		      </a>
+		    </div>
+		  </div>
+		<?php endforeach; ?>
+	      <?php endif; ?>
+
+	      <?php if ($record->access_level == '1'): ?>
+		<div class="clearfix">
+                   <div class="item-status item-web">
+                     <i class="fa fa-globe"> </i>
+                   </div>
+                   <div class="webressources">
+                     <a href="/cas">S'indentifier pour voir les notices masquées</a>
+                   </div>
+                 </div>
+	      <?php endif; ?>
             </div>
           </div>
         </div>
@@ -136,7 +156,7 @@
   <?php print $pager; ?>
 
 <?php elseif (!empty($lookfor)) : ?>
-  <h2><?php print t('Your search did not match any resources.');?></h2>
+  <h2><?php print 'Votre recherche n\'a donné aucun résultat';?></h2>
   <?php print search_help('search#noresults', drupal_help_arg()); ?>
 <?php endif; ?>
 

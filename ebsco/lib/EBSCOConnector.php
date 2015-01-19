@@ -88,6 +88,12 @@ class EBSCOConnector
      */
     private static $end_point = 'http://eds-api.ebscohost.com/EDSAPI/rest';
 
+    /**
+    * The URL of the EBSCO Publication API server
+    * @global string
+    */
+    private static $publication_end_point = 'http://eds-api.ebscohost.com/EDSAPI/publication';
+
 
     /**
      * The URL of the EBSCO API server
@@ -178,7 +184,7 @@ class EBSCOConnector
 
 
     /**
-     * Public getter for private isGuest 
+     * Public getter for private isGuest
      *
      * @param none
      *
@@ -258,6 +264,23 @@ BODY;
         return $response;
     }
 
+    /**
+    * Request the search publications api
+    *
+    * @param array $params Search specific parameters
+    * @param array $headers Authentication and session tokens
+    *
+    * @return object SimpleXml or PEAR_Error
+    * @access public
+    */
+    public function requestPublication($params, $headers)
+    {
+      $url = self::$publication_end_point . '/Search';
+
+      $response = $this->request($url, $params, $headers);
+      return $response;
+    }
+
 
     /**
      * Request a specific record
@@ -307,7 +330,7 @@ BODY;
      * @return object             SimpleXml or PEAR_Error
      * @access protected
      */
-    protected function request($url, $params, $headers = array(), $method = 'GET') 
+    protected function request($url, $params, $headers = array(), $method = 'GET')
     {
         $xml = false;
         $return = false;
@@ -383,12 +406,12 @@ BODY;
                     break;
 
                 case self::HTTP_NOT_FOUND:
-                    $return = new EBSCOException("HTTP {$code} : The resource you are looking for might 
+                    $return = new EBSCOException("HTTP {$code} : The resource you are looking for might
                         have been removed, had its name changed, or is temporarily unavailable.");
                     break;
 
                 case self::HTTP_INTERNAL_SERVER_ERROR:
-                    $return = new EBSCOException("HTTP {$code} : The server encountered an unexpected condition 
+                    $return = new EBSCOException("HTTP {$code} : The server encountered an unexpected condition
                         which prevented it from fulfilling the request.");
                     break;
 

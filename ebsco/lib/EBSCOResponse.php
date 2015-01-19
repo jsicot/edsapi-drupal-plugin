@@ -87,7 +87,7 @@ class EBSCOResponse
      }
 
     /**
-     * Parse a SimpleXml object and 
+     * Parse a SimpleXml object and
      * return it as an associative array
      *
      * @param none
@@ -98,6 +98,7 @@ class EBSCOResponse
     private function buildSearch()
     {
         $hits = (integer) $this->response->SearchResult->Statistics->TotalHits;
+
         $searchTime = (integer) $this->response->SearchResult->Statistics->TotalSearchTime / 1000;
         $records = array();
         $facets = array();
@@ -120,7 +121,7 @@ class EBSCOResponse
 
 
     /**
-     * Parse a SimpleXml object and 
+     * Parse a SimpleXml object and
      * return it as an associative array
      *
      * @param none
@@ -196,7 +197,7 @@ class EBSCOResponse
                     );
                 }
              }
-             
+
              if ($record->FullText->CustomLinks) {
                 $result['FullTextCustomLinks'] = array();
                 foreach ($record->FullText->CustomLinks->CustomLink as $customLink) {
@@ -232,7 +233,7 @@ class EBSCOResponse
                     );
                 }
             }
-            
+
             if($record->RecordInfo){
                $result['RecordInfo'] = array();
                $result['RecordInfo']['BibEntity']=array(
@@ -242,7 +243,7 @@ class EBSCOResponse
                    'Subjects'=>array(),
                    'Titles'=>array()
                );
-                
+
                if($record->RecordInfo->BibRecord->BibEntity->Identifiers){
                foreach($record->RecordInfo->BibRecord->BibEntity->Identifiers->Identifier as $identifier){
                    $type = $identifier->Type? (string) $identifier->Type:'';
@@ -251,9 +252,9 @@ class EBSCOResponse
                    'Type'=>$type,
                    'Value'=>$value
                    );
-               }            
                }
-               
+               }
+
                if($record->RecordInfo->BibRecord->BibEntity->Languages){
                foreach($record->RecordInfo->BibRecord->BibEntity->Languages->Language as $language){
                    $code = $language->Code? (string)$language->Code:'';
@@ -262,16 +263,16 @@ class EBSCOResponse
                    'Code'=>$code,
                    'Text'=>$text
                    );
-               }             
                }
-               
+               }
+
                if($record->RecordInfo->BibRecord->BibEntity->PhysicalDescription){
                $pageCount = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->PageCount:'';
                $startPage = $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage? (string) $record->RecordInfo->BibRecord->BibEntity->PhysicalDescription->Pagination->StartPage:'';
                $result['RecordInfo']['BibEntity']['PhysicalDescription']['Pagination'] = $pageCount;
                $result['RecordInfo']['BibEntity']['PhysicalDescription']['StartPage'] = $startPage;
                }
-               
+
                if($record->RecordInfo->BibRecord->BibEntity->Subjects){
                foreach($record->RecordInfo->BibRecord->BibEntity->Subjects->Subject as $subject){
                    $subjectFull = $subject->SubjectFull? (string)$subject->SubjectFull:'';
@@ -282,7 +283,7 @@ class EBSCOResponse
                    );
                }
                }
-               
+
                if($record->RecordInfo->BibRecord->BibEntity->Titles){
                foreach($record->RecordInfo->BibRecord->BibEntity->Titles->Title as $title){
                    $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
@@ -293,12 +294,12 @@ class EBSCOResponse
                    );
                }
                }
-               
+
                $result['RecordInfo']['BibRelationships']=array(
                    'HasContributorRelationships'=>array(),
-                   'IsPartOfRelationships'=>array()                
+                   'IsPartOfRelationships'=>array()
                );
-               
+
                if($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships){
                foreach($record->RecordInfo->BibRecord->BibRelationships->HasContributorRelationships->HasContributor as $contributor){
                    $nameFull = $contributor->PersonEntity->Name->NameFull? (string)$contributor->PersonEntity->Name->NameFull:'';
@@ -307,7 +308,7 @@ class EBSCOResponse
                    );
                }
                }
-               
+
                if($record->RecordInfo->BibRecord->BibRelationships){
                foreach($record->RecordInfo->BibRecord->BibRelationships->IsPartOfRelationships->IsPartOf as $relationship){
                    if($relationship->BibEntity->Dates){
@@ -324,7 +325,7 @@ class EBSCOResponse
                    );
                    }
                    }
-                   
+
                    if($relationship->BibEntity->Identifiers){
                    foreach($relationship->BibEntity->Identifiers->Identifier as $identifier){
                        $type = $identifier->Type? (string) $identifier->Type :'';
@@ -335,7 +336,7 @@ class EBSCOResponse
                        );
                    }
                    }
-                   
+
                    if($relationship->BibEntity->Titles){
                        foreach($relationship->BibEntity->Titles->Title as $title){
                           $titleFull = $title->TitleFull? (string)$title->TitleFull:'';
@@ -346,7 +347,7 @@ class EBSCOResponse
                            );
                        }
                    }
-                   
+
                    if($relationship->BibEntity->Numbering){
                        foreach($relationship->BibEntity->Numbering->Number as $number){
                         $type = (string)$number->Type;
@@ -369,7 +370,7 @@ class EBSCOResponse
 
 
      /**
-     * Parse a SimpleXml object and 
+     * Parse a SimpleXml object and
      * return it as an associative array
      *
      * @param none
@@ -412,7 +413,7 @@ class EBSCOResponse
 
 
     /**
-     * Parse a SimpleXml object and 
+     * Parse a SimpleXml object and
      * return it as an associative array
      *
      * @param none
@@ -492,7 +493,7 @@ class EBSCOResponse
 
 
     /**
-     * Parse a SimpleXml object and 
+     * Parse a SimpleXml object and
      * return it as an associative array
      *
      * @param none
@@ -584,7 +585,7 @@ class EBSCOResponse
 
 
     /**
-     * Parse a SimpleXml element and 
+     * Parse a SimpleXml element and
      * return it's inner XML as an HTML string
      *
      * @param SimpleXml $element  A SimpleXml DOM
@@ -594,7 +595,7 @@ class EBSCOResponse
      */
     private function toHTML($data, $group = null)
     {
-        // Any group can be added here, but we only use Au (Author) 
+        // Any group can be added here, but we only use Au (Author)
         // Other groups, not present here, won't be transformed to HTML links
         $allowed_searchlink_groups = array('au');
 

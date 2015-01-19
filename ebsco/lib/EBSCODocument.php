@@ -33,7 +33,7 @@ class EBSCODocument
     /**
      * The associative array of EBSCO results returned by a Search API call
      * #global array
-     */ 
+     */
     private $results = array();
 
     /**
@@ -67,15 +67,15 @@ class EBSCODocument
     private $filters = array();
 
     /**
-     * Maximum number of results returned by Search API call 
+     * Maximum number of results returned by Search API call
      * @global integer
-     */ 
+     */
     private $limit = 10;
 
     /**
      * Maximum number of links displayed by the pagination
      * @global integer
-     */ 
+     */
     private static $page_links = 10;
 
     /**
@@ -95,9 +95,9 @@ class EBSCODocument
      * global array
      */
     private static $sort_options = array(
-        'relevance' => 'Relevance',
-        'date_desc' => 'Date Descending',
-        'date_asc'  => 'Date Ascending'
+        'relevance' => 'Pertinence',
+        'date_desc' => 'Du plus récent au plus ancien',
+        'date_asc'  => 'Du plus ancien au plus récent'
     );
 
     /**
@@ -227,12 +227,12 @@ class EBSCODocument
         $filter = isset($this->params['filter']) ? $this->params['filter'] : array();
         $page = isset($this->params['page']) ? $this->params['page'] + 1 : 1;
         $limit = $this->limit;
-        $sort = isset($this->params['sort']) ? $this->params['sort'] : 'relevance';
-        $amount = isset($this->params['amount']) ? $this->params['amount'] : 'detailed';
-        $mode = isset($this->params['mode']) ? $this->params['mode'] : 'all';
+        $sort = isset($this->params['sort']) ? $this->params['sort'] : (variable_get('ebsco_default_sort') ? variable_get('ebsco_default_sort') : 'relevance');
+        $amount = isset($this->params['amount']) ? $this->params['amount'] : (variable_get('ebsco_default_amount') ? variable_get('ebsco_default_amount') : 'detailed');
+        $mode = isset($this->params['mode']) ? $this->params['mode'] : (variable_get('mode') ? variable_get('mode') : 'all');
 
         $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode);
-
+        $this->results['Publication'] = $this->eds->apiPublication($search, $filter, $page, $limit, $sort, $amount);
         if (isset($this->results['start'])) {
             $this->results['start'] = $limit * ($page - 1);
         }
@@ -272,6 +272,8 @@ class EBSCODocument
         return $this->records;
     }
 
+
+
     /**
      * Get the EBSCORecord models array from results array
      *
@@ -287,7 +289,7 @@ class EBSCODocument
 
         return $this->records;
     }
-    
+
     /**
      * Get the pagination HTML string
      *
@@ -578,6 +580,18 @@ class EBSCODocument
 
 
     /**
+    * Get the search time
+    *
+    * @return decimal number
+    */
+    public function publication()
+    {
+      return !empty($this->results) &&
+      isset($this->results['Publication']) ? $this->results['Publication'] : null;
+    }
+
+
+    /**
      * Get the search view : basic or advanced
      *
      * @return string
@@ -682,7 +696,7 @@ class EBSCODocument
     }
 
 
-    /** 
+    /**
      * Load last search data from session
      *
      * @return array
@@ -701,7 +715,7 @@ class EBSCODocument
                 // if this is not the first scroll and if this is not a page refresh
                 if (isset($lastSearch['current']) && $lastSearch['current'] != $id) {
                     // if we change page
-                    if (($op == 'Next' && $index % $this->limit === 0) || 
+                    if (($op == 'Next' && $index % $this->limit === 0) ||
                         ($op == 'Previous' && $index % $this->limit === 9)) {
                         $params['page'] = ($op == 'Next') ? $params['page'] + 1 : $params['page'] - 1;
                         $query = drupal_http_build_query($params);
@@ -769,7 +783,7 @@ class EBSCODocument
      *
      * @return array
      */
-    private function array_filter_recursive($input, $callback = null) 
+    private function array_filter_recursive($input, $callback = null)
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
