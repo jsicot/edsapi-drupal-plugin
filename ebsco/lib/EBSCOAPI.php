@@ -628,7 +628,7 @@ class EBSCOAPI
       'resultsperpage' => 3,
       'pagenumber'     => $start,
       // Specifies whether or not to include highlighting in the search results
-      'highlight'      => 'y'
+      'highlight'      => 'n'
       );
 
       $params = array_merge($params, $query);
