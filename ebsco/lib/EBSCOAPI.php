@@ -489,7 +489,7 @@ class EBSCOAPI
             'view'           => $amount,
             /// Specifies whether or not to include facets
             'includefacets'  => 'y',
-            'resultsperpage' => 5,
+            'resultsperpage' => $limit,
             'pagenumber'     => $start,
             // Specifies whether or not to include highlighting in the search results
             'highlight'      => 'y'
@@ -625,7 +625,7 @@ class EBSCOAPI
       'view'           => 'detailed',
       /// Specifies whether or not to include facets
       'includefacets'  => 'n',
-      'resultsperpage' => $limit,
+      'resultsperpage' => 5,
       'pagenumber'     => $start,
       // Specifies whether or not to include highlighting in the search results
       'highlight'      => 'y'
