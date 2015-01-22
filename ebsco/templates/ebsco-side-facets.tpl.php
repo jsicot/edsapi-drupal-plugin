@@ -14,7 +14,17 @@
 
 <div class="sidegroup">
   <?php if ($record_count >= 0): ?>
-    <h2><?php print t('Narrow Search')?></h2>
+    <div id="facets" class="facets sidenav">
+      <div class="top-panel-heading panel-heading">
+        <button data-target="#facet-panel-collapse" data-toggle="collapse" class="facets-toggle" type="button">
+          <span class="sr-only">Déplier les facettes</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <h2><?php print t('Narrow Search')?></h2>
+      </div>
+<div id="facet-panel-collapse" class="panel-group collapse" style="height: 0px;">
     <form name="updateForm" action="<?php print url('ebsco/results'); ?>" method="get">
       <?php if ($search_params): ?>
         <span>
@@ -52,10 +62,18 @@
         </dl>
       <?php endif; ?>
 
-      <dl class="narrow-list navmenu">
-        <dt><?php print t('Limit Results'); ?></dt>
+
+      <div class="panel panel-default facet_limit eds-limiters">
+        <div class="collapse-toggle panel-heading collapsed " data-toggle="collapse" data-target="#facet-limiters">
+          <h5 class="panel-title">
+            <a data-no-turbolink="true" href="#"><?php print t('Limit Results'); ?></a>
+          </h5>
+        </div>
+        <div id="facet-limiters" class="panel-collapse facet-content collapse in" style="height: auto;">
+          <div class="panel-body facet-panel">
+            <ul class="facet-values list-unstyled">
         <?php foreach ($limiters as $limiter): ?>
-          <dd>
+          <li>
             <?php if ($limiter['Type'] == 'multiselectvalue'): ?>
               <label for="<?php print check_plain($limiter['Id']); ?>">
                 <?php print t($limiter['Label']); ?>
@@ -69,16 +87,19 @@
                 <?php endforeach; ?>
               </select>
             <?php else: ?>
-              <input type="checkbox" name="filter[]" value="<?php print check_plain(str_replace('value', 'y', $limiter['Action'])); ?>" 
+              <input type="checkbox" name="filter[]" value="<?php print check_plain(str_replace('value', 'y', $limiter['Action'])); ?>"
                 <?php print $limiter['selected'] ? ' checked="checked"' : ''; ?> id="<?php print check_plain($limiter['Id']); ?>"
               />
               <label for="<?php print check_plain($limiter['Id']); ?>">
                 <?php print check_plain(t($limiter['Label'])); ?>
               </label>
             <?php endif; ?>
-          </dd>
+          </li>
         <?php endforeach; ?>
-      </dl>
+      </ul>
+    </div>
+  </div>
+</div>
 
       <dl class="narrow-list navmenu">
         <?php if ($expanders): ?>
@@ -145,5 +166,7 @@
         <?php endforeach; ?>
       <?php endif; ?>
     </form>
+  </div>
+</div>
   <?php endif; ?>
 </div>

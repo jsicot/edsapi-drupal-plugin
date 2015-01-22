@@ -63,6 +63,16 @@
               <div class="pt-icon pt-<?php echo $record->PubTypeId; ?>"></div>
               <?php //echo $record->publication_type; ?>
             <?php endif; ?>
+            <?php if ((!empty($record->summary)) || (!empty($record->subjects))): ?>
+            <div class="MoreButton">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#MoreDetails" href="#collapseMore<?php print $record->result_id(); ?>" title="plus d'infos">
+              <span class="fa-stack fa-lg">
+                <i class="fa fa-circle fa-stack-2x"></i>
+                <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                </span>
+              </a>
+            </div>
+          <?php endif; ?>
           </span>
           <div class='record-detail'>
             <div class="result-line1">
@@ -108,18 +118,22 @@
 
             <div class="result-line3">
 
-
-
-
               <?php if (!empty($record->summary)): ?>
-                <cite><?php print $record->summary; ?></cite>
-                <br />
-              <?php endif; ?>
+                <div class="accordion" id="MoreDetails">
 
-              <?php if (!empty($record->subjects)): ?>
-                <strong><?php print t('Subjects'); ?></strong>:
-                <span class="quotestart"><?php print str_replace('<br />', ', ', $record->subjects); ?></span>
-              <?php endif; ?>
+                  <div id="collapseMore<?php print $record->result_id(); ?>" class="collapse">
+                    <div class='record-abstract well'><?php print $record->summary; ?></div>
+
+                      <?php if (!empty($record->subjects)): ?>
+                        <div class='record-subjects'><?php $subjects = str_replace('<br />', ', ', $record->subjects); print str_replace('*', '', $subjects); ?></div>
+                      <?php endif; ?>
+
+                  </div>
+                </div>
+            <?php endif; ?>
+
+
+
 
 
 
@@ -130,7 +144,7 @@
           <?php if ($record->access_level == '1'): ?>
             <div class="span1">
               <div class="pull-right view-record hidden-sm">
-                <a class="btn btn-success" href="<?php print $pdfUrl; ?>" target='_blank' title="S'identifier pour voir les notices masquées" class="external-link">
+                <a class="btn btn-success" href="/cas" target='_blank' title="S'identifier pour voir les notices masquées" class="external-link">
                   <span class="fa fa-lock"></span>
                 </a>
               </div>

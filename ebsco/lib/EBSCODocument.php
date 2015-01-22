@@ -580,7 +580,7 @@ class EBSCODocument
 
 
     /**
-    * Get the search time
+    * Get the Publication API Results
     *
     * @return decimal number
     */

@@ -86,40 +86,128 @@ class EBSCOResponse
         return $result;
      }
 
+
     /**
-     * Parse a SimpleXml object and
-     * return it as an associative array
-     *
-     * @param none
-     *
-     * @return array   An associative array of data
-     * @access private
-     */
+    * Parse the SimpleXml object when a Search API call was executed
+    *
+    * @param none
+    *
+    * @return array An associative array of data
+    * @access private
+    */
     private function buildSearch()
     {
-        $hits = (integer) $this->response->SearchResult->Statistics->TotalHits;
-
-        $searchTime = (integer) $this->response->SearchResult->Statistics->TotalSearchTime / 1000;
-        $records = array();
-        $facets = array();
-        if ($hits > 0) {
-            $records = $this->buildRecords();
-            $facets = $this->buildFacets();
+      $hits = (integer) $this->response->SearchResult->Statistics->TotalHits;
+      $searchTime = (integer) $this->response->SearchResult->Statistics->TotalSearchTime / 1000;
+      $queryString = (string)$this->response->SearchRequestGet->QueryString;
+      $records = array();
+      $facets = array();
+      $queries = array();
+      $appliedFacets = array();
+      $appliedLimiters = array();
+      $appliedExpanders = array();
+      $relatedRecords = array();
+      if($this->response->SearchRequestGet->SearchCriteriaWithActions->QueriesWithAction){
+        $queriesWithAction = $this->response->SearchRequestGet->SearchCriteriaWithActions->QueriesWithAction->QueryWithAction;
+        foreach($queriesWithAction as $queryWithAction){
+          $queries[]=array(
+            'query' => (string)$queryWithAction->Query->Term,
+            'removeAction'=> (string) $queryWithAction->RemoveAction
+          );
         }
-
-        $results = array(
-            'recordCount' => $hits,
-            'searchTime'  => $searchTime,
-            'numFound'    => $hits,
-            'start'       => 0,
-            'documents'   => $records,
-            'facets'      => $facets
-        );
-
-        return $results;
+      }
+      if($this->response->SearchRequestGet->SearchCriteriaWithActions->FacetFiltersWithAction){
+        $facetFiltersWithAction = $this->response->SearchRequestGet->SearchCriteriaWithActions->FacetFiltersWithAction->FacetFilterWithAction;
+        foreach($facetFiltersWithAction as $facetFilterWithAction){
+          $facetValue = array();
+          foreach($facetFilterWithAction->FacetValuesWithAction->FacetValueWithAction as $facetValueWithAction){
+            $facetValue[] = array(
+              'Id' => (string)$facetValueWithAction->FacetValue->Id,
+              'value'=>(string)$facetValueWithAction->FacetValue->Value,
+              'removeAction'=>(string)$facetValueWithAction->RemoveAction
+            );
+          }
+          $appliedFacets[] = array(
+            'filterId' => (string)$facetFilterWithAction->FilterId,
+            'facetValue'=> $facetValue,
+            'removeAction'=> (string)$facetFilterWithAction->RemoveAction
+          );
+        }
+      }
+      if($this->response->SearchRequestGet->SearchCriteriaWithActions->LimitersWithAction){
+        $limitersWithAction = $this->response->SearchRequestGet->SearchCriteriaWithActions->LimitersWithAction->LimiterWithAction;
+        foreach($limitersWithAction as $limiterWithAction){
+          $limiterValue = array(
+          'value' => (string) $limiterWithAction->LimiterValuesWithAction->LimiterValueWithAction->Value,
+          'removeAction'=> (string) $limiterWithAction->LimiterValuesWithAction->LimiterValueWithAction->RemoveAction
+          );
+          $appliedLimiters[] = array(
+          'Id' => (string)$limiterWithAction->Id,
+          'limiterValue'=>$limiterValue,
+          'removeAction'=> (string) $limiterWithAction->RemoveAction
+          );
+        }
+      }
+      if($this->response->SearchRequestGet->SearchCriteriaWithActions->ExpandersWithAction){
+        $expandersWithAction = $this->response->SearchRequestGet->SearchCriteriaWithActions->ExpandersWithAction->ExpanderWithAction;
+        foreach($expandersWithAction as $expanderWithAction){
+          $appliedExpanders[] = array(
+          'Id' => (string)$expanderWithAction->Id,
+          'removeAction'=>(string)$expanderWithAction->RemoveAction
+          );
+        }
+      }
+      if($this->response->SearchResult->RelatedContent){
+        $relatedRecsWithAction = $this->response->SearchResult->RelatedContent->RelatedRecords;
+        foreach($relatedRecsWithAction->RelatedRecord as $relRecs){
+          if ($relRecs->Type == "rs") {
+            foreach($relRecs->Records->Record as $rec) {
+              $items=array();
+              foreach ($rec->Items->Item as $item) {
+                $items[] = array(
+                'Name' => (string)$item->Name,
+                'Label' => (string)$item->Label,
+                'Group' => (string)$item->Group,
+                'Data' => (string)$item->Data,
+                );
+              }
+              $records[] = array(
+              'Id' => (string)$rec->ResultId,
+              'DbId' => (string)$rec->Header->DbId,
+              'DbLabel'=>(string)$rec->Header->DbLabel,
+              'An'=>(string)$rec->Header->An,
+              'PLink'=>(string)$rec->PLink,
+              'ImageInfo'=>(string)$rec->ImageInfo->CoverArt->Target,
+              'FullText'=>(string)$rec->FullText,
+              'Items'=>$items
+              );
+            }
+            $relatedRecords[] = array(
+            'Label' => (string)$relRecs->Label,
+            'records' => $records
+            );
+          }
+        }
+      }
+      if ($hits > 0) {
+        $records = $this->buildRecords();
+        $facets = $this->buildFacets();
+      }
+      $results = array(
+      'recordCount' => $hits,
+      'searchTime'  => $searchTime,
+      'queryString' => $queryString,
+      'numFound'    => $hits,
+      'queries' => $queries,
+      'appliedFacets'=>$appliedFacets,
+      'appliedLimiters'=>$appliedLimiters,
+      'appliedExpanders'=>$appliedExpanders,
+      'relatedRecords'=>$relatedRecords,
+      'documents' => $records,
+      'facets' => $facets
+      );
+      return $results;
     }
-
-
     /**
      * Parse a SimpleXml object and
      * return it as an associative array
@@ -380,8 +468,8 @@ class EBSCOResponse
      */
     private function buildFacets()
     {
-        $results = array();
-
+      $results = array();
+      if($this->response->SearchResult->AvailableFacets){
         $facets = $this->response->SearchResult->AvailableFacets->AvailableFacet;
         foreach ($facets as $facet) {
             $values = array();
@@ -409,87 +497,91 @@ class EBSCOResponse
         }
 
         return $results;
+      }
     }
 
 
     /**
-     * Parse a SimpleXml object and
-     * return it as an associative array
-     *
-     * @param none
-     *
-     * @return array      An associative array of data
-     * @access private
-     */
+    * Parse the SimpleXml object when an Info API call was executed
+    *
+    * @param none
+    *
+    * @return array An associative array of data
+    * @access private
+    */
     private function buildInfo()
     {
-        // Sort options
-        $elements = $this->response->AvailableSearchCriteria->AvailableSorts->AvailableSort;
-        $sort = array();
-        foreach ($elements as $element) {
-            $sort[] = array(
-                'Id'     => (string) $element->Id,
-                'Label'  => (string) $element->Label,
-                'Action' => (string) $element->AddAction
-            );
-        }
-
-        // Search fields
-        $elements = $this->response->AvailableSearchCriteria->AvailableSearchFields->AvailableSearchField;
-        $tags = array();
-        foreach ($elements as $element) {
-            $tags[] = array(
-                'Label' => (string) $element->Label,
-                'Code'  => (string) $element->FieldCode
-            );
-        }
-
-        // Expanders
-        $elements = $this->response->AvailableSearchCriteria->AvailableExpanders->AvailableExpander;
-        $expanders = array();
-        foreach ($elements as $element) {
-            $expanders[] = array(
-                'Id'       => (string) $element->Id,
-                'Label'    => (string) $element->Label,
-                'Action'   => (string) $element->AddAction,
-                'selected' => false // Added because of the checkboxes
-            );
-        }
-
-        // Limiters
-        $elements = $this->response->AvailableSearchCriteria->AvailableLimiters->AvailableLimiter;
-        $limiters = array();
-		$values = array();
-        foreach ($elements as $element) {
-            if ($element->LimiterValues) {
-                $items = $element->LimiterValues->LimiterValue;
-                foreach($items as $item) {
-                    $values[] = array(
-                        'Value'    => (string) $item->Value,
-                        'Action'   => (string) $item->AddAction,
-                        'selected' => false // Added because of the checkboxes
-                    );
-                }
-            }
-            $limiters[] = array(
-                'Id'       => (string) $element->Id,
-                'Label'    => (string) $element->Label,
-                'Action'   => (string) $element->AddAction,
-                'Type'     => (string) $element->Type,
-                'Values'   => $values,
-                'selected' => false
-            );
-        }
-
-        $result = array(
-            'sort'      => $sort,
-            'tags'      => $tags,
-            'expanders' => $expanders,
-            'limiters'  => $limiters
+      // Sort options
+      $sort = array();
+      foreach ($this->response->AvailableSearchCriteria->AvailableSorts->AvailableSort as $element) {
+        $sort[] = array(
+          'Id' => (string) $element->Id,
+          'Label' => (string) $element->Label,
+          'Action' => (string) $element->AddAction
         );
-
-        return $result;
+      }
+      // Search fields
+      $search = array();
+      foreach ($this->response->AvailableSearchCriteria->AvailableSearchFields->AvailableSearchField as $element) {
+        $search[] = array(
+          'Label' => (string) $element->Label,
+          'Code' => (string) $element->FieldCode
+        );
+      }
+      // Expanders
+      $expanders = array();
+      foreach ($this->response->AvailableSearchCriteria->AvailableExpanders->AvailableExpander as $element) {
+        $expanders[] = array(
+          'Id' => (string) $element->Id,
+          'Label' => (string) $element->Label,
+          'Action' => (string) $element->AddAction,
+          'selected' => false // Added because of the checkboxes
+        );
+      }
+      // Limiters
+      $limiters = array();
+      foreach ($this->response->AvailableSearchCriteria->AvailableLimiters->AvailableLimiter as $element) {
+        $values = array();
+        if ($element->LimiterValues) {
+          $items = $element->LimiterValues->LimiterValue;
+          foreach($items as $item) {
+            $values[] = array(
+              'Value' => (string) $item->Value,
+              'Action' => (string) $item->AddAction,
+              'selected' => false // Added because of the checkboxes
+            );
+          }
+        }
+        $limiters[] = array(
+        'Id' => (string) $element->Id,
+        'Label' => (string) $element->Label,
+        'Action' => (string) $element->AddAction,
+        'Type' => (string) $element->Type,
+        'values' => $values,
+        'selected' => false // Added because of the checkboxes
+        );
+      }
+      // related content
+      $relatedcontent = array();
+      foreach ($this->response->AvailableSearchCriteria->AvailableRelatedContent->AvailableRelatedContent as $element) {
+        $values = array();
+        $relatedcontent[] = array(
+        'Type' => (string) $element->Type,
+        'Label' => (string) $element->Label,
+        'Action' => (string) $element->AddAction,
+        'DefaultOn' => (string) $element->DefaultOn
+        );
+      }
+      $result = array(
+      'sort' => $sort,
+      'search' => $search,
+      'expanders' => $expanders,
+      'limiters' => $limiters,
+      'relatedcontent' => $relatedcontent
+      );
+      return $result;
     }
+
 
 
     /**
@@ -597,47 +689,54 @@ class EBSCOResponse
     {
         // Any group can be added here, but we only use Au (Author)
         // Other groups, not present here, won't be transformed to HTML links
-        $allowed_searchlink_groups = array('au');
+        $allowed_searchlink_groups = array('au','su');
 
         // Map xml tags to the HTML tags
         // This is just a small list, the total number of xml tags is far more greater
+
         $xml_to_html_tags = array(
-            '<jsection'    => '<section',
-            '</jsection'   => '</section',
-            '<highlight'   => '<span class="highlight"',
-            '<highligh'    => '<span class="highlight"', // Temporary bug fix
-            '</highlight>' => '</span>', // Temporary bug fix
-            '</highligh'   => '</span>',
-            '<text'        => '<div',
-            '</text'       => '</div',
-            '<title'       => '<h2',
-            '</title'      => '</h2',
-            '<anid'        => '<p',
-            '</anid'       => '</p',
-            '<aug'         => '<p class="aug"',
-            '</aug'        => '</p',
-            '<hd'          => '<h3',
-            '</hd'         => '</h3',
-            '<linebr'      => '<br',
-            '</linebr'     => '',
-            '<olist'       => '<ol',
-            '</olist'      => '</ol',
-            '<reflink'     => '<a',
-            '</reflink'    => '</a',
-            '<blist'       => '<p class="blist"',
-            '</blist'      => '</p',
-            '<bibl'        => '<a',
-            '</bibl'       => '</a',
-            '<bibtext'     => '<span',
-            '</bibtext'    => '</span',
-            '<ref'         => '<div class="ref"',
-            '</ref'        => '</div',
-            '<ulink'       => '<a',
-            '</ulink'      => '</a',
-            '<superscript' => '<sup',
-            '</superscript'=> '</sup',
-            '<relatesTo'   => '<sup',
-            '</relatesTo'  => '</sup'
+          '<jsection' => '<section',
+          '</jsection' => '</section',
+          '<highlight' => '<span class="highlight"',
+          '<highligh' => '<span class="highlight"', // Temporary bug fix
+          '</highlight>' => '</span>', // Temporary bug fix
+          '</highligh' => '</span>',
+          '<text' => '<div',
+          '</text' => '</div',
+          '<title' => '<h2',
+          '</title' => '</h2',
+          '<anid' => '<p',
+          '</anid' => '</p',
+          '<aug' => '<strong',
+          '</aug' => '</strong',
+          '<hd' => '<h3',
+          '</hd' => '</h3',
+          '<linebr' => '<br',
+          '</linebr' => '',
+          '<olist' => '<ol',
+          '</olist' => '</ol',
+          '<reflink' => '<a',
+          '</reflink' => '</a',
+          '<blist' => '<p class="blist"',
+          '</blist' => '</p',
+          '<bibl' => '<a',
+          '</bibl' => '</a',
+          '<bibtext' => '<span',
+          '</bibtext' => '</span',
+          '<ref' => '<div class="ref"',
+          '</ref' => '</div',
+          '<ulink' => '<a',
+          '</ulink' => '</a',
+          '<superscript' => '<sup',
+          '</superscript'=> '</sup',
+          '<relatesTo' => '<sup',
+          '</relatesTo' => '</sup',
+          // A very basic security implementation, using a blackist instead of a whitelist as needed.
+          // But the total number of xml tags is so large that we won't build a whitelist right now
+          '<script' => '',
+          '</script' => '',
+          '<i>' => '',
+          '</i>' => ''
         );
 
         // Map xml types to Search types used by the UI

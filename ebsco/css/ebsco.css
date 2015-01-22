@@ -115,9 +115,14 @@ a.label:hover, a.label:focus {
 .page-ebsco-results .borders .sidebar .region, .borders .content-wrapper{
   border:none !important;
 }
+
+.page-ebsco-results h1#page-title {
+  display: none;
+}
+
 .ebsco .result {
     width: 650px;
-}  
+}
 
 .ebsco .record-number {
   font-size:.9em;
@@ -317,6 +322,17 @@ a.label:hover, a.label:focus {
 .search-results.ebsco .authors,.search-results.ebsco .ref {
 	font-size: .9em;
   margin: 0 !important;
+}
+#MoreDetails.accordion {
+  font-size: 0.9em;
+  margin: 5px 0;
+}
+.record-subjects {
+  font-weight: 400;
+}
+
+.MoreButton {
+  padding: 15px;
 }
 /** Detailed view ***/
 
@@ -645,3 +661,88 @@ a.label:hover, a.label:focus {
 .pull-right {
     float: right !important;
 }
+
+#sidebar, #facets {
+    padding-bottom: 10px;
+}
+#facet-panel-collapse {
+    border-top: medium none;
+    box-shadow: none;
+    max-height: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+.facets-toggle {
+    border-color: #dddddd;
+}
+.facets-toggle .icon-bar {
+    background-color: #888888;
+}
+.facet-values {
+    display: table;
+    width: 100%;
+}
+.facet-values li {
+    display: table-row;
+}
+.facet-values li .remove {
+    text-indent: 12px;
+}
+.facet-values li .remove .glyphicon {
+    top: 0.1em;
+    vertical-align: text-top;
+}
+.facet-values li .remove:hover {
+    color: #d9534f;
+}
+.facet-values .facet-label {
+    -moz-hyphens: auto;
+    display: table-cell;
+    padding-bottom: 6px;
+    padding-left: 15px;
+    padding-right: 1em;
+    text-indent: -15px;
+    word-break: break-all;
+}
+.facet-values .facet-count {
+    display: table-cell;
+    text-align: right;
+    vertical-align: top;
+}
+.facet_extended_list .sort_options {
+    text-align: right;
+}
+.facet_extended_list .prev_next_links {
+    float: left;
+}
+.collapse-toggle {
+    cursor: pointer;
+}
+.panel-heading.collapse-toggle .panel-title:after {
+    color: grey;
+    content: "";
+    float: right;
+    font-family: "Glyphicons Halflings";
+    font-size: 0.8em;
+    line-height: normal;
+}
+.panel-heading.collapse-toggle.collapsed .panel-title:after {
+    content: "";
+}
+@media (max-width: 768px) {
+.facets-toggle {
+    margin-top: 3px;
+}
+#facets .top-panel-heading {
+    border: 1px solid #cccccc;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    margin-bottom: 1em;
+}
+}
+.pivot-facet ul, .pivot-facet .pivot-facet {
+    padding-bottom: 6px;
+    padding-left: 16px;
+}
+
+
