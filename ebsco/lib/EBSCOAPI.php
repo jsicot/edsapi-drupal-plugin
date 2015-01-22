@@ -492,7 +492,7 @@ class EBSCOAPI
             'resultsperpage' => $limit,
             'pagenumber'     => $start,
             // Specifies whether or not to include highlighting in the search results
-            'highlight'      => 'y'
+            'highlight'      => 'n'
         );
 
         $params = array_merge($params, $query);
@@ -626,7 +626,7 @@ class EBSCOAPI
       /// Specifies whether or not to include facets
       'includefacets'  => 'n',
       'resultsperpage' => 3,
-      'pagenumber'     => $start,
+      'pagenumber'     => 1,
       // Specifies whether or not to include highlighting in the search results
       'highlight'      => 'n'
       );

@@ -412,17 +412,16 @@ function ebsco_sort_form() {
         '#method'     => 'get'
     );
 
-    $options = EBSCODocument::amount_options();
-    $values = array_values($options);
-    $default_value = isset($params['amount']) ? $params['amount'] : $values[0];
-    $form['mode'] = array(
-        '#id'            => 'ebsco-amount',
-        '#type'          => 'select',
-        '#title'         => t('Page options'),
-        '#default_value' => $default_value,
-        '#options'       => $options,
-        '#attributes'    => array('class' => array('form-select', '_jump_menu'))
-    );
+    // $options = EBSCODocument::amount_options();
+    // $values = array_values($options);
+    // $default_value = isset($params['amount']) ? $params['amount'] : $values[0];
+    // $form['mode'] = array(
+    //     '#id'            => 'ebsco-amount',
+    //     '#type'          => 'select',
+    //     '#default_value' => $default_value,
+    //     '#options'       => $options,
+    //     '#attributes'    => array('class' => array('form-control', '_jump_menu'))
+    // );
 
     $options = EBSCODocument::sort_options();
     $values = array_values($options);
@@ -430,10 +429,9 @@ function ebsco_sort_form() {
     $form['sort'] = array(
         '#id'            => 'ebsco-sort',
         '#type'          => 'select',
-        '#title'         => t('Sort'),
         '#default_value' => $default_value,
         '#options'       => $options,
-        '#attributes'    => array('class' => array('form-select', '_jump_menu'))
+        '#attributes'    => array('class' => array('form-control', '_jump_menu'))
     );
 
     return $form;
