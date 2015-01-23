@@ -101,46 +101,54 @@
   </div>
 </div>
 
-      <dl class="narrow-list navmenu">
-        <?php if ($expanders): ?>
-          <dt><?php print t('Expand Results'); ?></dt>
-        <?php endif; ?>
-
+      <div class="panel panel-default facet_limit eds-expanders">
+        <div class="collapse-toggle panel-heading collapsed " data-toggle="collapse" data-target="#facet-expanders">
+          <h5 class="panel-title">
+            <a data-no-turbolink="true" href="#"><?php print t('Expand Results'); ?></a>
+          </h5>
+        </div>
+        <div id="facet-expanders" class="panel-collapse facet-content collapse in" style="height: auto;">
+          <div class="panel-body facet-panel">
+            <ul class="facet-values list-unstyled">
         <?php foreach($expanders as $expander): ?>
-          <dd>
+          <li>
             <input type="checkbox" name="filter[]" value="<?php print check_plain($expander['Action']); ?>"
               <?php print $expander['selected'] ? ' checked="checked"' : ''; ?> id="<?php print check_plain($expander['Id']); ?>"
             />
             <label for="<?php print check_plain($expander['Id']); ?>">
               <?php print check_plain(t($expander['Label'])); ?>
             </label>
-          </dd>
+          </li>
         <?php endforeach; ?>
 
-        <dd class="submit">
+        <li class="submit">
           <input type="submit" name="submit" class="form-submit" value="<?php print t('Update'); ?>" />
-        </dd>
-      </dl>
+        </li>
+     </ul>
+    </div>
+  </div>
+</div>
 
       <?php if (!empty($facets)): ?>
         <?php foreach ($facets as $title => $cluster): ?>
-          <dl id="facet-<?php print check_plain(t($title)); ?>" class="narrow-list navmenu expandable">
-            <dt>
-              <span class="icon13 collapsed">
-                <?php print check_plain(t($cluster['Label'])); ?>
-              </span>
-            </dt>
-          </dl>
+     <div class="panel panel-default facet_limit eds-<?php print check_plain(t($title)); ?>">
+        <div class="collapse-toggle panel-heading collapsed " data-toggle="collapse" data-target="#facet-<?php print check_plain(t($title)); ?>">
+          <h5 class="panel-title">
+            <a data-no-turbolink="true" href="#"><?php print check_plain(t($cluster['Label'])); ?></a>
+          </h5>
+        </div>
+        <div id="facet-<?php print check_plain(t($title)); ?>" class="panel-collapse facet-content collapse in" style="height: auto;">
+          <div class="panel-body facet-panel">
+            <ul class="facet-values list-unstyled">
 
-          <dl class="narrow-list navmenu offscreen" id="narrowGroupHidden_<?php print check_plain($title); ?>">
             <?php foreach ($cluster['Values'] as $index => $facet): ?>
               <?php if ($facet['applied']): ?>
-                <dd>
+                <li>
                   <?php print check_plain($facet['Value']); ?>
                   <span class="icon16 tick"></span>
-                </dd>
+                </li>
               <?php else: ?>
-                <dd>
+                <li>
                   <input type="checkbox" name="filter[]" value="<?php print check_plain($facet['Action']); ?>"
                     id="filter<?php print check_plain($index); ?>"
                   />
@@ -150,19 +158,16 @@
                     </a>
                     (<?php print check_plain($facet['Count']); ?>)
                   </label>
-                </dd>
+                </li>
               <?php endif; ?>
             <?php endforeach; ?>
-
-            <dd>
-              <p class="submit">
+           </ul>
+    </div>
+  </div>
+</div>      
+            <div class="submit">
                 <input type="submit" class="form-submit" name="submit" value="<?php print t('Update'); ?>" />
-              </p>
-              <a href="javascript:void(0)" class="expandable">
-                <?php print t('Less'); ?> ...
-              </a>
-            </dd>
-          </dl>
+            </div>
         <?php endforeach; ?>
       <?php endif; ?>
     </form>
