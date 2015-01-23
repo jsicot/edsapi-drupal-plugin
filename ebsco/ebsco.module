@@ -597,7 +597,7 @@ function ebsco_advanced_search_form() {
 
     $form['advanced']['rows']['add_row'] = array(
         '#type'  => 'fieldset',
-        '#value' => "<a class=\"add _add_row\" href=\"#\">". t('Add Search Field') . "</a>"
+        '#value' => "<a class=\"add _add_row\" href=\"#\"><i class=\"fa fa-plus fa-2x\"></i></a>"
     );
 
     $items = array(
@@ -721,7 +721,7 @@ function ebsco_advanced_search_form() {
             $selects[] = theme('form_element', array('element' => $element));
         } else if ($limiter['Type'] == 'ymrange') {
             $value = $limiter['selected'] ? $limiter['selected'] : '';
-            $displayValue = str_replace(array('addlimiter(DT1:', '-1/2013-1)'), array('', ''), $value);
+            $displayValue = str_replace(array('addlimiter(DT1:', '-1/'.(date('Y')+1).'-1)'), array('', ''), $value);
             $element = array(
                 '#type'              => 'textfield',
                 '#id'                => $limiter['Id'],

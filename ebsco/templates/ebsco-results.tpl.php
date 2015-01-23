@@ -9,21 +9,28 @@
 ?>
 
 <?php if ($records): ?>
+  <?php print $pager; ?>
   <div class="clearfix" id="sortAndPerPage">
     <div class="page_links">
       <span class="page_entries">
         <strong><?php print $record_start; ?></strong> - <strong><?php print $record_end; ?></strong>
-        <?php print t('of'); ?> <strong><?php print $record_count; ?></strong>
+        <?php print t('of'); ?> <strong><?php print $record_count; ?></strong> résultats,
       </span>
-      | <a href="">Suivant »</a>
+      <?php if ($search_view == 'basic'): ?>
+        <?php print t('for search')?>: <strong>'<?php print check_plain($lookfor); ?>'</strong>
+        <?php endif; ?>
+        <?php if ($search_time): ?>
+          <?php print t('query time'); ?>: <?php print check_plain(round($search_time, 2)); ?>s
+        <?php endif; ?>
     </div>
 
     <div class="search-widgets pull-right">
       <?php print $sort_form; ?>
     </div>
+
   </div>
 
-  <?php //print $pager; ?>
+
 
   <div class="search-results ebsco">
     <?php foreach ($records as $record): ?>
@@ -125,7 +132,7 @@
                     <div class='record-abstract well'><?php print $record->summary; ?></div>
 
                       <?php if (!empty($record->subjects)): ?>
-                        <div class='record-subjects'><?php $subjects = str_replace('<br />', ', ', $record->subjects); print str_replace('*', '', $subjects); ?></div>
+                        <div class='record-subjects'><i class="fa fa-tags"></i> <?php $subjects = str_replace('<br />', ', ', $record->subjects); print str_replace('*', '', $subjects); ?></div>
                       <?php endif; ?>
 
                   </div>

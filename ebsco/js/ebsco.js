@@ -7,7 +7,7 @@
     // 
     var updatePublishDateSlider = function () {
         var from = parseInt($('#DT1').val());
-        var min = 1000;
+        var min = 1600;
 
         if (!from || from < min) {
             from = min;
@@ -160,11 +160,12 @@
                 range: true,
                 min: 0, max: 9999, values: [0, 9999],
                 slide: function (event, ui) {
-                    $('#DT1').val(ui.values[0]);
-                    if(ui.values[0] == 1000) {
+                    if(ui.values[0] == $(event.target).slider('option','min') && ui.values[1] == $(event.target).slider('option','max')) {
                         $('#ebsco-advanced-search-limiterDT1').val('');
+			$('#DT1').val('');
                     } else {
-                        $('#ebsco-advanced-search-limiterDT1').val('addlimiter(DT1:' + ui.values[0] + '-1/2013-1)');
+                        $('#ebsco-advanced-search-limiterDT1').val('addlimiter(DT1:' + ui.values[0] + '-1/' + ui.values[1] + '-1)');
+			$('#DT1').val(ui.values[0]+ ' - ' +ui.values[1]);
                     }
                 }
             });
