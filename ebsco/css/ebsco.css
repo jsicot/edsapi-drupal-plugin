@@ -47,7 +47,7 @@ hr {
   height: 0;
 }
 
-.label {
+.page-ebsco .label {
   border-radius: 0.25em;
   color: #ffffff;
   display: inline;
@@ -59,55 +59,55 @@ hr {
   vertical-align: baseline;
   white-space: nowrap;
 }
-.label a {
+.page-ebsco .label a {
   color: #ffffff;
 }
-.label:empty {
+.page-ebsco .label:empty {
   display: none;
 }
-.btn .label, .facets-toggle .label {
+.page-ebsco .btn .label, .page-ebsco .facets-toggle .label {
   position: relative;
   top: -1px;
 }
-a.label:hover, a.label:focus {
+.page-ebsco a.label:hover, .page-ebsco a.label:focus {
   color: #ffffff;
   cursor: pointer;
   text-decoration: none;
 }
-.label-default {
+.page-ebsco .label-default {
   background-color: #999999;
 }
-.label-default[href]:hover, .label-default[href]:focus {
+.page-ebsco .label-default[href]:hover, .page-ebsco .label-default[href]:focus {
   background-color: #808080;
 }
-.label-primary {
+.page-ebsco .label-primary {
   background-color: #428bca;
 }
-.label-primary[href]:hover, .label-primary[href]:focus {
+.page-ebsco .label-primary[href]:hover, .page-ebsco .label-primary[href]:focus {
   background-color: #3071a9;
 }
-.label-success {
+.page-ebsco .label-success {
   background-color: #5cb85c;
 }
-.label-success[href]:hover, .label-success[href]:focus {
+.page-ebsco .label-success[href]:hover, .page-ebsco .label-success[href]:focus {
   background-color: #449d44;
 }
-.label-info {
+.page-ebsco .label-info {
   background-color: #5bc0de;
 }
-.label-info[href]:hover, .label-info[href]:focus {
+.page-ebsco .label-info[href]:hover, .page-ebsco .label-info[href]:focus {
   background-color: #31b0d5;
 }
-.label-warning {
+.page-ebsco .label-warning {
   background-color: #f0ad4e;
 }
-.label-warning[href]:hover, .label-warning[href]:focus {
+.page-ebsco .label-warning[href]:hover, .page-ebsco .label-warning[href]:focus {
   background-color: #ec971f;
 }
-.label-danger {
+.page-ebsco .label-danger {
   background-color: #d9534f;
 }
-.label-danger[href]:hover, .label-danger[href]:focus {
+.page-ebsco .label-danger[href]:hover, .page-ebsco .label-danger[href]:focus {
   background-color: #c9302c;
 }
 
@@ -1498,4 +1498,16 @@ ul.facet-values {
 }
 .item-list ul.pagination li{
   margin:0 !important;
+}
+#ebsco-advanced-search-presubmit {
+  display: block;
+  width: 150px;
+  margin: auto;
+}
+#ebsco-advanced-search-submit,
+#ebsco-advanced-search-clear {
+  float: right;
+}
+#ebsco-advanced-search-hidden-submit {
+  display: none;
 }

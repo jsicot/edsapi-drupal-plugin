@@ -600,7 +600,11 @@ function ebsco_advanced_search_form() {
         '#value' => "<a class=\"add _add_row\" href=\"#\"><i class=\"fa fa-plus fa-2x\"></i></a>"
     );
 
-    $items = array(
+    $form['advanced']['presubmit'] = array(
+       '#markup'  => '<input id="ebsco-advanced-search-presubmit" class="form-submit btn btn-primary" type="submit" value="' . t('Search') . '" name="search" />'
+    );
+
+    /*$items = array(
         array(
             'url'   => url('ebsco/results'),
             'title' => t('Basic search')
@@ -617,7 +621,7 @@ function ebsco_advanced_search_form() {
     $form['advanced']['links'] = array(
         '#type'  => 'fieldset',
         '#value' => implode(' | ', $links)
-    );
+    );*/
 
     $form['advanced']['modes'] = array(
         '#type'  => 'fieldset',
@@ -702,7 +706,8 @@ function ebsco_advanced_search_form() {
             $checkboxes[] = theme('form_element', array('element' => $element));
         } else if ($limiter['Type'] == 'multiselectvalue') {
             $opts = array('' => t('All'));
-            foreach($limiter['Values'] as $value) {
+		//echo "<pre>";var_dump($limiter);echo "</pre>";
+            foreach($limiter['values'] as $value) {
                 $opts[$value['Action']] = $value['Value'];
             }
             $element = array(
@@ -729,7 +734,7 @@ function ebsco_advanced_search_form() {
                 '#value'             => $displayValue,
                 '#name'              => $limiter['Id'],
                 '#autocomplete_path' => null,
-                '#attributes'        => array('size' => 4, 'maxlength' => 4, 'class' => array('yearbox'))
+                '#attributes'        => array('size' => 4, 'class' => array('yearbox'))
             );
             $element['#children'] = theme('textfield', array('element' => $element));
             $element['#children'] .= '<input id="ebsco-advanced-search-limiter' . $limiter['Id'] . '" type="hidden" name="filter[]" value="' . $value . '"/>';
@@ -760,13 +765,17 @@ function ebsco_advanced_search_form() {
     );
 
     $form['advanced']['submit'] = array(
-        '#id'    => 'ebsco-advanced-search-submit',
-        '#type'  => 'submit',
-        '#value' => t('Search')
+	'#type' => 'submit',
+	'#id' => 'ebsco-advanced-search-hidden-submit'
     );
 
+    $form['advanced']['submit2'] = array(
+	'#markup' => '<input id="ebsco-advanced-search-submit" class="form-submit btn btn-primary" type="submit" value="' . t('Search') . '" name="search">'
+    );
+
+
     $form['advanced']['clear'] = array(
-        '#markup'  => '<input id="ebsco-advanced-search-clear" class="form-submit" type="reset" value="' . t('Clear') . '" name="reset">'
+        '#markup'  => '<input id="ebsco-advanced-search-clear" class="form-submit btn" type="reset" value="' . t('Clear') . '" name="reset">'
     );
 
     return $form;
