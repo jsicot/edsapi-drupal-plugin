@@ -105,9 +105,9 @@ class EBSCODocument
      * global array
      */
     private static $amount_options = array(
-        'detailed' => 'Detailed',
-        'brief'    => 'Brief',
-        'title'    => 'Title Only'
+        'detailed' => 'Détaillé',
+        'brief'    => 'Bref',
+        'title'    => 'Titre'
     );
 
     /**
@@ -115,9 +115,9 @@ class EBSCODocument
      * global array
      */
     private static $bool_options = array(
-        'AND' => 'All terms',
-        'OR'  => 'Any terms',
-        'NOT' => 'No terms'
+        'AND' => 'Tout',
+        'OR'  => 'Ou',
+        'NOT' => 'Sauf'
     );
 
     /**
@@ -125,10 +125,10 @@ class EBSCODocument
      * global array
      */
     private static $mode_options = array(
-        'all'   => 'All search terms',
-        'bool'  => 'Boolean / Phrase',
-        'any'   => 'Any search terms',
-        'smart' => 'SmartText Searching'
+        'all'   => 'Trouver tous mes termes',
+        'bool'  => 'Booléen/Phrase',
+        'any'   => 'Trouver l\'un des mes termes',
+        'smart' => 'Recherche intelligente'
     );
 
     /**
@@ -136,12 +136,12 @@ class EBSCODocument
      * global array
      */
     private static $basic_search_type_options = array(
-        'AllFields' => 'All Text',
-        'Title'     => 'Title',
-        'Author'    => 'Author',
-        'Subject'   => 'Subject terms',
+        'AllFields' => 'Tout',
+        'Title'     => 'Titre',
+        'Author'    => 'Auteur',
+        'Subject'   => 'Sujets',
         'Source'    => 'Source',
-        'Abstract'  => 'Abstract'
+        'Abstract'  => 'Résumé'
     );
 
     /**
@@ -149,10 +149,10 @@ class EBSCODocument
      * global array
      */
     private static $advanced_search_type_options = array(
-        'AllFields' => 'All Text',
-        'Title'     => 'Title',
-        'Author'    => 'Author',
-        'Subject'   => 'Subject terms'
+        'AllFields' => 'Tout',
+        'Title'     => 'Titre',
+        'Author'    => 'Auteur',
+        'Subject'   => 'Subjets'
     );
 
 
