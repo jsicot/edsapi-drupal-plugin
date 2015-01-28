@@ -115,7 +115,7 @@ class EBSCODocument
      * global array
      */
     private static $bool_options = array(
-        'AND' => 'Tout',
+        'AND' => 'Et',
         'OR'  => 'Ou',
         'NOT' => 'Sauf'
     );
