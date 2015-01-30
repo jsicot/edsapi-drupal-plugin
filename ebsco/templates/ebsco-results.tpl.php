@@ -39,7 +39,7 @@
 
 
 
-      $recordUrl = url('ebsco/result', array('query' => array('id' => $id)));
+      $recordUrl = $record->p_link();
 
 
       $fulltextUrl = url('ebsco/fulltext', array('query' => array('id' => $id)));
@@ -141,17 +141,13 @@
 
 
 
-
-
-
-
             </div>
             </div>
           </div>
           <?php if ($record->access_level == '1'): ?>
             <div class="span1">
               <div class="pull-right view-record hidden-sm">
-                <a class="btn btn-success" href="/cas" target='_blank' title="S'identifier pour voir les notices masquées" class="external-link">
+                <a class="btn btn-success" href="/cas" title="S'identifier pour voir les notices masquées" class="external-link">
                   <span class="fa fa-lock"></span>
                 </a>
               </div>
