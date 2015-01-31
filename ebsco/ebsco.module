@@ -65,9 +65,6 @@ function ebsco_theme() {
         'ebsco_results' => array(
             'template' => 'templates/ebsco-results'
         ),
-        'ebsco_json' => array(
-          'template' => 'templates/ebsco-json'
-        ),
         'ebsco_side_facets' => array(
             'template' => 'templates/ebsco-side-facets'
         ),
@@ -229,6 +226,13 @@ function ebsco_menu() {
       'type' => MENU_CALLBACK
     );
 
+    $items['ebsco/apipublication'] = array(
+      'page callback' => 'ebsco_crud_apipublication_page',
+      'access callback' => true,
+      'type' => MENU_CALLBACK
+    );
+
+
     $items['ebsco/result'] = array(
         'title' => 'EBSCO Record',
         'page callback' => 'ebsco_result_page',
@@ -322,10 +326,6 @@ function ebsco_block_view($delta = '') {
 
 function ebsco_results_page() {
     return theme('ebsco_results');
-}
-
-function ebsco_json_page() {
-  return theme('ebsco_json');
 }
 
 function ebsco_result_page() {
@@ -912,6 +912,49 @@ function template_preprocess_ebsco_results(&$variables) {
     $Document->search_write();
 }
 
+/**
+* The CRUD API for communication with Backbone.
+*/
+	function ebsco_crud_apipublication_page() {
+  global $Document;
+  $params = $_REQUEST;
+  $output = array();
+
+  if (empty($Document)) {
+    $Document = new EBSCODocument();
+  }
+  $Document->search();
+  $output['searchTerm'] = '';
+  if (isset($params['lookfor'])) {
+    $output['searchTerm'] = $params['lookfor'];
+  } else if (isset($params['group'])) {
+    $types = EBSCODocument::basic_search_type_options();
+    foreach ($params['group'] as $key => $group) {
+      if (!empty($group['lookfor'])) {
+        $pre = $key == 0 ? '' : " {$group['bool']} ";
+        $output['searchTerm'] .= $pre . $types[$group['type']] . ':' . $group['lookfor'];
+      }
+    }
+  }
+  if (isset($params['type'])) {
+    $output['fieldCode'] = $params['type'];
+  }
+  $output['results'] = $Document->publication();
+  //$output['Info'] = $Document->info();
+
+
+  // Save data needed by scroller in Detailed view page
+  $Document->search_write();
+
+
+  if ($_GET['callback']) {
+    drupal_add_http_header('Content-Type', 'application/json');
+    echo $_GET['callback'] . '(' . drupal_json_encode($output) . ');';
+  }
+  else {
+    drupal_json_output( $output );
+  }
+}
 
 
 /**

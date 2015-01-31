@@ -305,6 +305,18 @@ class EBSCOResponse
                     );
                 }
              }
+             
+             if ($record->FullTextHoldings) {
+                $result['FullTextHoldings'] = array();
+                foreach ($record->FullTextHoldings->FullTextHolding as $FullTextHolding) {
+                    $name = $FullTextHolding->Name ? (string) $FullTextHolding->Name : '';
+                    $url = $FullTextHolding->URL ? (string) $FullTextHolding->URL : '';
+                    $result['FullTextHoldings'][] = array(
+                        'Name'          => $name,
+                        'URL'           => $url
+                    );
+                }
+             }
 
             if($record->Items) {
                 $result['Items'] = array();
