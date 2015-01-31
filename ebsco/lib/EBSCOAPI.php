@@ -55,7 +55,10 @@ class EBSCOAPI
         'Author'    => 'AU',
         'Source'    => 'SO',
         'Subject'   => 'SU',
-        'Title'     => 'TI'
+        'Title'     => 'TI',
+		'ISBN'      => 'IB',
+		'ISSN'      => 'IS'
+
     );
 
 

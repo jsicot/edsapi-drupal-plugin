@@ -141,7 +141,10 @@ class EBSCODocument
         'Author'    => 'Auteur',
         'Subject'   => 'Sujets',
         'Source'    => 'Source',
-        'Abstract'  => 'Résumé'
+        'Abstract'  => 'Résumé',
+        'ISBN'  	=> 'ISBN',
+        'ISSN'  	=> 'ISSN'
+
     );
 
     /**
@@ -152,7 +155,8 @@ class EBSCODocument
         'AllFields' => 'Tout',
         'Title'     => 'Titre',
         'Author'    => 'Auteur',
-        'Subject'   => 'Subjets'
+        'ISBN'   	=> 'ISBN',
+        'ISSN'   	=> 'ISSN'
     );
 
 
