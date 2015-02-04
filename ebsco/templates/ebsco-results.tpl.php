@@ -147,11 +147,11 @@
           <?php if ($record->access_level == '1'): ?>
 	<?php 
 		$actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-		$cas_login = "http://www.bu.univ-rennes2.fr/eds_login?previousUrl=".$actual_link;
+		$cas_login = "/eds_login?previousUrl=".urlencode($actual_link);
 	?> 
             <div class="span1">
               <div class="pull-right view-record hidden-sm">
-                <a class="btn btn-success" href="<?php echo urlencode($cas_login); ?>" title="S'identifier pour voir les notices masquées" class="external-link">
+                <a class="btn btn-success" href="<?php echo $cas_login; ?>" title="S'identifier pour voir les notices masquées" class="external-link">
                   <span class="fa fa-lock"></span>
                 </a>
               </div>
