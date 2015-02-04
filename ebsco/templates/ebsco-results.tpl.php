@@ -151,7 +151,7 @@
 	?> 
             <div class="span1">
               <div class="pull-right view-record hidden-sm">
-                <a class="btn btn-success" href="<?php echo $cas_login; ?>" title="S'identifier pour voir les notices masquées" class="external-link">
+                <a class="btn btn-success" href="<?php echo urlencode($cas_login); ?>" title="S'identifier pour voir les notices masquées" class="external-link">
                   <span class="fa fa-lock"></span>
                 </a>
               </div>
