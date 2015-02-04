@@ -876,7 +876,7 @@ function template_preprocess_ebsco_results(&$variables) {
     global $Document;
     $params = $_REQUEST;
 
-    $_SESSION['EBSCO']['redirect'] = drupal_get_destination();
+    //$_SESSION['EBSCO']['redirect'] = drupal_get_destination();
     if (empty($Document)) {
         $Document = new EBSCODocument();
     }
@@ -915,7 +915,8 @@ function template_preprocess_ebsco_results(&$variables) {
 /**
 * The CRUD API for communication with Backbone.
 */
-	function ebsco_crud_apipublication_page() {
+
+function ebsco_crud_apipublication_page() {
   global $Document;
   $params = $_REQUEST;
   $output = array();
@@ -960,7 +961,8 @@ function template_preprocess_ebsco_results(&$variables) {
 /**
 * The CRUD API for communication with Backbone.
 */
-	function ebsco_crud_api_page() {
+
+function ebsco_crud_api_page() {
   global $Document;
   $params = $_REQUEST;
   $output = array();
