@@ -236,7 +236,7 @@ class EBSCODocument
         $mode = isset($this->params['mode']) ? $this->params['mode'] : (variable_get('mode') ? variable_get('mode') : 'all');
 
         $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode);
-        $this->results['Publication'] = $this->eds->apiPublication($search, $filter, $page, $limit, $sort, $amount);
+        $this->results['Publication'] = $this->eds->apiPublication($search, '', $page, $limit, $sort, $amount);
         if (isset($this->results['start'])) {
             $this->results['start'] = $limit * ($page - 1);
         }
