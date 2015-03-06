@@ -43,8 +43,9 @@
 
 
       $fulltextUrl = url('ebsco/fulltext', array('query' => array('id' => $id)));
-      $pdfUrl = url('ebsco/pdf', array('query' => array('id' => $id)));
-      if ($record->pdf_availability):
+      //$pdfUrl = url('ebsco/pdf', array('query' => array('id' => $id)));
+      $pdfUrl = $record->p_link();
+	if ($record->pdf_availability):
             $recordUrl = $pdfUrl;
       elseif (!empty($record->custom_links)):
         foreach ($record->custom_links as $link):
