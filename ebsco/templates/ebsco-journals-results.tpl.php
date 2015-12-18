@@ -75,17 +75,27 @@
 
 
           ?>
-          <div class='row'>
-            <div class="col-sm-1">
+          <div class='row-fluid'>
+            <div class="span1">
               <?php print $record->result_id; ?>
             </div>
-            <div class="record col-sm-11">
-              <div class='row'>
-                <div class="col-sm-11">
+            <div class="record span11">
+              <div class='row-fluid'>
+                <div class="span11">
                   <span class="pull-left hidden-sm">
                     <?php if (isset($record->PubTypeId) && !empty($record->PubTypeId) && isset($record->publication_type) && !empty($record->publication_type) && $record->PubTypeId != "pt-unknown"): ?>
                       <div class="pt-icon pt-<?php echo $record->PubTypeId; ?>"></div>
                       <?php //echo $record->publication_type; ?>
+                    <?php endif; ?>
+                    <?php if ((!empty($record->summary)) || (!empty($record->subjects))): ?>
+                      <div class="MoreButton">
+                        <a class="accordion-toggle" data-toggle="collapse" data-parent="#MoreDetails" href="#collapseMore<?php print $record->result_id(); ?>" title="plus d'infos">
+                          <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                          </span>
+                        </a>
+                      </div>
                     <?php endif; ?>
                   </span>
                   <div class='record-detail'>
@@ -130,6 +140,25 @@
                       <?php endif; ?>
                     </div>
 
+                    <div class="result-line3">
+
+                      <?php if (!empty($record->summary)): ?>
+                        <div class="accordion" id="MoreDetails">
+
+                          <div id="collapseMore<?php print $record->result_id(); ?>" class="collapse">
+                            <div class='record-abstract well'><?php print $record->summary; ?></div>
+
+                            <?php if (!empty($record->subjects)): ?>
+                              <div class='record-subjects'><i class="fa fa-tags"></i> <?php $subjects = str_replace('<br />', ', ', $record->subjects); print str_replace('*', '', $subjects); ?></div>
+                            <?php endif; ?>
+
+                          </div>
+                        </div>
+                      <?php endif; ?>
+
+
+
+                    </div>
                   </div>
                 </div>
                 <?php if ($record->access_level == '1'): ?>
@@ -137,7 +166,7 @@
                   $actual_link = "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
                   $cas_login = "eds_login?previousUrl=".urlencode($actual_link);
                   ?>
-                  <div class="col-sm-1">
+                  <div class="span1">
                     <div class="pull-right view-record hidden-sm">
                       <a class="btn btn-success" href="<?php echo $cas_login; ?>" title="S'identifier pour voir les notices masquées" class="external-link">
                         <span class="fa fa-lock"></span>
@@ -145,7 +174,7 @@
                     </div>
                   </div>
                 <?php elseif ($record->pdf_availability): ?>
-                  <div class="col-sm-1">
+                  <div class="span1">
                     <div class="pull-right view-record hidden-sm">
                       <a class="btn btn-danger" href="<?php print $pdfUrl; ?>" target='_blank' title="Consulter le PDF" class="external-link">
                         <span class="fa fa-file-pdf-o"></span>
@@ -155,7 +184,7 @@
                 <?php elseif (!empty($record->custom_links)): ?>
                   <?php foreach ($record->custom_links as $link): ?>
                     <?php if ($link['Name'] == 'Full Text Finder'): ?>
-                      <div class="col-sm-1">
+                      <div class="span1">
                         <div class="pull-right view-record hidden-sm">
                           <a class="btn btn-primary" href="<?php print $link['Url']; ?>" target='_blank' title="<?php print $link['MouseOverText']; ?>" class="external-link">
                             <span class="fa fa-globe"></span>
@@ -165,7 +194,7 @@
                     <?php endif; ?>
                   <?php endforeach; ?>
                 <?php else: ?>
-                  <div class="col-sm-1">
+                  <div class="span1">
                     <div class="pull-right view-record hidden-sm">
                       <a class="btn btn-info" href="<?php print $recordUrl; ?>" target='_blank' title="consulter la notice détaillée" class="external-link">
                         <span class="fa fa-eye"></span>

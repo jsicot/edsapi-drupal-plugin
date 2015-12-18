@@ -6,4 +6,3 @@ configure = admin/config/search/ebsco
 
 stylesheets[screen][] = css/ebsco.css
 stylesheets[screen][] = css/pubtype-icons.css
-scripts[] = js/ebsco.js

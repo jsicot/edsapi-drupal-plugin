@@ -13,12 +13,12 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 require_once 'EBSCOConnector.php';
@@ -70,9 +70,8 @@ class EBSCOAPI
         'Source'    => 'SO',
         'Subject'   => 'SU',
         'Title'     => 'TI',
-		'ISBN'      => 'IB',
-		'ISSN'      => 'IS'
-
+		    'ISBN'      => 'IB',
+		    'ISSN'      => 'IS'
     );
 
 
@@ -84,7 +83,7 @@ class EBSCOAPI
         'relevance',
         'date',
         'date2',
-        'source'
+        'author'
     );
 
 
@@ -633,17 +632,17 @@ class EBSCOAPI
       // relevance, date, date2
       // date = Date descending
       // date2 = Date ascending
-      'sort'           => 'relevance',
+      'sort'           => $sortBy,
       // Specifies the amount of data to return with the response
       // Valid options are:
       // title: Title only
       // brief: Title + Source, Subjects
       // detailed: Brief + full abstract
-      'view'           => 'detailed',
+      'view'           => $amount,
       /// Specifies whether or not to include facets
-      'includefacets'  => 'n',
-      'resultsperpage' => 3,
-      'pagenumber'     => 1,
+      'includefacets'  => 'y',
+      'resultsperpage' => $limit,
+      'pagenumber'     => $start,
       // Specifies whether or not to include highlighting in the search results
       'highlight'      => 'n'
       );

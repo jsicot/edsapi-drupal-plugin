@@ -18,12 +18,12 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 require_once 'EBSCOAPI.php';
@@ -250,7 +250,7 @@ class EBSCODocument
         $mode = isset($this->params['mode']) ? $this->params['mode'] : (variable_get('mode') ? variable_get('mode') : 'all');
 
         $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode);
-        $this->results['Publication'] = $this->eds->apiPublication($search, '', $page, $limit, $sort, $amount);
+        $this->results['Publication'] = $this->eds->apiPublication($search, array(), $page, $limit, $sort, $amount);
         if (isset($this->results['start'])) {
             $this->results['start'] = $limit * ($page - 1);
         }
@@ -568,8 +568,9 @@ class EBSCODocument
      */
     public function record_end()
     {
+
         $count = !empty($this->results) ? count($this->results['documents']) : 0;
-        $start = !empty($this->results) ? $this->results['start'] : 0;
+        $start = !empty($this->results) ? $this->results['documents'][0]['ResultId'] : 0;
         return $start + $count;
     }
 
@@ -581,7 +582,7 @@ class EBSCODocument
      */
     public function record_start()
     {
-        return !empty($this->results) ? $this->results['start'] + 1 : 0;
+        return !empty($this->results) ? $this->results['documents'][0]['ResultId'] : 0;
     }
 
 
