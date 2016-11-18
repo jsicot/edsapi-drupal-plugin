@@ -144,7 +144,7 @@
 
         $('#ebsco-sort-form').on('change', '._jump_menu', function (event) {
             var name = $(this).attr('id').replace('ebsco-', ''),
-                value = $(this).attr('value'),
+                value = $(this).val(),
                 url = $('#ebsco-sort-form').attr('action');
             url += "&" + name + "=" + value;
             window.location.href = url;
