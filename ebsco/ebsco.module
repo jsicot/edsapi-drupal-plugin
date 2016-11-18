@@ -464,7 +464,7 @@ function ebsco_side_facets_block() {
      $params = $_REQUEST;
 
      $form = array(
-         '#attributes' => array('class' => array('eds-form-search', 'col-md-8', 'col-md-offset-2')),
+         '#attributes' => array('class' => array('form-search', 'col-lg-12', 'col-lg-offset-1')),
          '#action'     => url('ebsco/results'),
          '#method'     => 'get'
      );

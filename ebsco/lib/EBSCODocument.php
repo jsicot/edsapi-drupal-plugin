@@ -248,13 +248,19 @@ class EBSCODocument
         $sort = isset($this->params['sort']) ? $this->params['sort'] : (variable_get('ebsco_default_sort') ? variable_get('ebsco_default_sort') : 'relevance');
         $amount = isset($this->params['amount']) ? $this->params['amount'] : (variable_get('ebsco_default_amount') ? variable_get('ebsco_default_amount') : 'detailed');
         $mode = isset($this->params['mode']) ? $this->params['mode'] : (variable_get('mode') ? variable_get('mode') : 'all');
-
-        $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode);
-        $this->results['Publication'] = $this->eds->apiPublication($search, array(), $page, $limit, $sort, $amount);
-        if (isset($this->results['start'])) {
-            $this->results['start'] = $limit * ($page - 1);
-        }
-
+		
+		if (is_object($this->results)) {
+		  watchdog('Ebsco', 'Search failure. Response from EDS was: ' . $this->results, array(), 'WATCHDOG_ERROR');
+		  $this->results = (array) $this->results; // If it's an empty object, re-cast it as an array to prevent errors.
+		}
+		else {
+			 $this->results = $this->eds->apiSearch($search, $filter, $page, $limit, $sort, $amount, $mode);
+			 $this->results['Publication'] = $this->eds->apiPublication($search, array(), $page, $limit, $sort, $amount);
+			 if (isset($this->results['start'])) {
+			 	$this->results['start'] = $limit * ($page - 1);
+        	 }
+			
+		}
         return $this->results;
     }
 

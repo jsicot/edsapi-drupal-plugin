@@ -11,7 +11,7 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -112,11 +112,18 @@ class EBSCORecord
      public $publication_type = null;
 
      /**
+     * The publication date of the record.
+     * @global string
+     */
+     public $date_publication = array();
+
+
+     /**
      * The publication type link of the record.
      * @global string
      */
      public $PubTypeId = null;
-     
+
      /**
      * The external thumbnails links of the record.
      * @global string
@@ -171,6 +178,8 @@ class EBSCORecord
         $this->medium_thumb_link = $this->thumb_link('medium');
         $this->source = $this->source();
         $this->access_level = $this->access_level();
+        $this->date_publication = $this->date_publication();
+
     }
 
 
@@ -188,7 +197,7 @@ class EBSCORecord
      */
     public function access_level()
     {
-        return isset($this->data['AccessLevel']) ? 
+        return isset($this->data['AccessLevel']) ?
             $this->data['AccessLevel'] : '';
     }
 
@@ -200,7 +209,7 @@ class EBSCORecord
      */
     public function summary()
     {
-        return isset($this->data['Items']['Abstract']) ? 
+        return isset($this->data['Items']['Abstract']) ?
             $this->data['Items']['Abstract']['Data'] : '';
     }
 
@@ -212,7 +221,7 @@ class EBSCORecord
      */
     public function authors()
     {
-        return isset($this->data['Items']['Author']) ? 
+        return isset($this->data['Items']['Author']) ?
             $this->data['Items']['Author']['Data'] : '';
     }
 
@@ -248,7 +257,7 @@ class EBSCORecord
      */
     public function full_text()
     {
-        return isset($this->data['FullText']) && 
+        return isset($this->data['FullText']) &&
             isset($this->data['FullText']['Value']) ? $this->data['FullText']['Value'] : '';
     }
 
@@ -260,7 +269,7 @@ class EBSCORecord
      */
     public function full_text_availability()
     {
-        return isset($this->data['FullText']) && 
+        return isset($this->data['FullText']) &&
             $this->data['FullText']['Availability'];
     }
 
@@ -306,7 +315,7 @@ class EBSCORecord
     {
         return isset($this->data['PubTypeId']) ? $this->data['PubTypeId'] : '';
     }
-    
+
     /**
      * Get the PDF availability of the record.
      *
@@ -314,9 +323,9 @@ class EBSCORecord
      */
     public function pdf_availability()
     {
-        return isset($this->data['FullText']) && 
-            isset($this->data['FullText']['Links']) && 
-            isset($this->data['FullText']['Links']['pdflink']) && 
+        return isset($this->data['FullText']) &&
+            isset($this->data['FullText']['Links']) &&
+            isset($this->data['FullText']['Links']['pdflink']) &&
             $this->data['FullText']['Links']['pdflink'];
     }
 
@@ -328,9 +337,9 @@ class EBSCORecord
      */
     public function pdf_link()
     {
-        return isset($this->data['FullText']) && 
-            isset($this->data['FullText']['Links']) && 
-            isset($this->data['FullText']['Links']['pdflink']) ? 
+        return isset($this->data['FullText']) &&
+            isset($this->data['FullText']['Links']) &&
+            isset($this->data['FullText']['Links']['pdflink']) ?
             $this->data['FullText']['Links']['pdflink'] :
             '';
     }
@@ -343,7 +352,7 @@ class EBSCORecord
      */
     public function result_id()
     {
-        return isset($this->data['ResultId']) ? 
+        return isset($this->data['ResultId']) ?
             $this->data['ResultId'] : '';
     }
 
@@ -355,7 +364,7 @@ class EBSCORecord
      */
     public function subjects()
     {
-        return isset($this->data['Items']['Subject']) ? 
+        return isset($this->data['Items']['Subject']) ?
             $this->data['Items']['Subject']['Data'] : '';
     }
 
@@ -396,7 +405,7 @@ class EBSCORecord
      */
     public function title()
     {
-        return isset($this->data['Items']['Title']) ? 
+        return isset($this->data['Items']['Title']) ?
             $this->data['Items']['Title']['Data'] : '';
     }
 
@@ -406,9 +415,22 @@ class EBSCORecord
      *
      * @return string
      */
+    public function date_publication()
+    {
+        return isset($this->data['RecordInfo']['BibRelationships']['IsPartOfRelationships']['date']) ?
+            $this->data['RecordInfo']['BibRelationships']['IsPartOfRelationships']['date'] : array();
+    }
+
+
+
+    /**
+     * Get the source of the record.
+     *
+     * @return string
+     */
     public function source()
     {
-        return isset($this->data['Items']['TitleSource']) ? 
+        return isset($this->data['Items']['TitleSource']) ?
             $this->data['Items']['TitleSource']['Data'] : '';
     }
 
@@ -420,7 +442,7 @@ class EBSCORecord
      */
     public function record_id()
     {
-        return isset($this->data['id']) ? 
+        return isset($this->data['id']) ?
             $this->data['id'] : '';
     }
 
